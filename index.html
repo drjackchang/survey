@@ -269,7 +269,7 @@ function isDraft(s) {
 
   function cardHTML(s) {
     const iconColor = (s.status === 'closed') ? 'gray' : '';
-    const btnDisabled = (s.status !== 'active') ? 'disabled' : '';
+    const btnDisabled = !isActive(s) ? 'disabled' : '';
     const btnText = s.status === 'active' ? '開啟問卷 ↗' : (s.status === 'closed' ? '收案已結束' : '尚未開放');
     const period = `${formatDate(s.start)} — ${formatDate(s.end)}`;
 
