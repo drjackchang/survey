@@ -12,6 +12,8 @@ const SURVEYS = [
     lang: '中文 / English',
     pi: '張育通、Brett Williams',
     piEn: 'Jack Chang, Brett Williams',
+    affiliation: '國立臺北護理健康大學、Imam Abdulrahman Bin Faisal University',
+    affiliationEn: 'National Taipei University of Nursing and Health Sciences, Imam Abdulrahman Bin Faisal University',
   },
   {
     id: 'ems-dnr',
@@ -26,6 +28,9 @@ const SURVEYS = [
     lang: '中文',
     pi: '張育通、Brett Williams',
     piEn: 'Jack Chang, Brett Williams',
+    affiliation: '國立臺北護理健康大學、Imam Abdulrahman Bin Faisal University',
+    affiliationEn: 'National Taipei University of Nursing and Health Sciences, Imam Abdulrahman Bin Faisal University',
+
   },
   {
     id: 'ems-mental',
@@ -38,7 +43,10 @@ const SURVEYS = [
     end: '2026/05/30',
     icon: 'ti-brain',
     lang: '中文',
-    pi: '張育通',
-    piEn: 'Jack Chang',
+    pi: '張育通、Brett Williams',
+    piEn: 'Jack Chang, Brett Williams',
+    affiliation: '國立臺北護理健康大學、Imam Abdulrahman Bin Faisal University',
+    affiliationEn: 'National Taipei University of Nursing and Health Sciences, Imam Abdulrahman Bin Faisal University',
+
   },
 ];

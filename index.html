@@ -292,6 +292,7 @@ function isDraft(s) {
         ${statusLabel(s)}
         <span class="meta-date">📅 ${period}</span>
         ${s.pi ? `<span class="meta-date">👤 ${s.pi}${s.piEn ? ` · ${s.piEn}` : ''}</span>` : ''}
+        ${s.affiliation ? `<span class="meta-date">🏫 ${s.affiliation}${s.affiliationEn ? ` · ${s.affiliationEn}` : ''}</span>` : ''}
         ${s.lang ? `<span class="meta-date">🌐 ${s.lang}</span>` : ''}
       </div>
       <a class="card-btn ${btnDisabled}" href="${s.url}" target="_blank" rel="noopener">
