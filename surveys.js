@@ -31,7 +31,7 @@ const SURVEYS = [
     url: 'https://tally.so/r/Bzdy27',
     status: 'active',
     start: '2026/04/01',
-    end: '2026/06/30',
+    end: '2026/05/01',
     icon: 'ti-brain',
     lang: '中文',
   },
