@@ -100,7 +100,7 @@
   /* ── Grid ── */
   .survey-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
     gap: 12px;
   }
 
@@ -244,11 +244,11 @@
     return str.replace(/\/(0)(\d)/g, '/$2');
   }
 
-  function statusLabel(status, lang) {
-    if (status === 'active') return '<span class="badge badge-active">收案中</span>';
-    if (status === 'closed') return '<span class="badge badge-closed">已結束</span>';
-    return '<span class="badge badge-draft">即將開放</span>';
-  }
+  function statusLabel(s) {
+  if (isDraft(s))  return '<span class="badge badge-draft">尚未開始</span>';
+  if (isClosed(s)) return '<span class="badge badge-closed">已截止</span>';
+  return '<span class="badge badge-active">收案中</span>';
+}
 
   function isActive(s) {
   const today = new Date();
@@ -270,7 +270,7 @@ function isDraft(s) {
   function cardHTML(s) {
     const iconColor = (s.status === 'closed') ? 'gray' : '';
     const btnDisabled = !isActive(s) ? 'disabled' : '';
-    const btnText = s.status === 'active' ? '開啟問卷 ↗' : (s.status === 'closed' ? '收案已結束' : '尚未開放');
+const btnText = isActive(s) ? '開啟問卷 ↗' : isClosed(s) ? '收案已截止' : '尚未開放';
     const period = `${formatDate(s.start)} — ${formatDate(s.end)}`;
 
     return `
@@ -285,7 +285,7 @@ function isDraft(s) {
         </div>
       </div>
       <div class="card-meta">
-        ${statusLabel(s.status)}
+        ${statusLabel(s)}
         <span class="meta-date">📅 ${period}</span>
         ${s.lang ? `<span class="meta-date">🌐 ${s.lang}</span>` : ''}
       </div>
