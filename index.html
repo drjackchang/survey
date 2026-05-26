@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EMS問卷平台 · 國立臺北護理健康大學健康科技學院/TSP台灣醫療救護學會</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚑</text></svg>">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --primary: #0F6E56;
+    --primary-light: #E1F5EE;
+    --primary-mid: #1D9E75;
+    --amber-bg: #FAEEDA;
+    --amber-text: #854F0B;
+    --gray-bg: #F1EFE8;
+    --gray-text: #5F5E5A;
+    --bg: #f8faf9;
+    --card: #ffffff;
+    --border: rgba(0,0,0,0.08);
+    --border-hover: rgba(0,0,0,0.15);
+    --text: #1a1a1a;
+    --muted: #6b7280;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --primary: #1D9E75;
+      --primary-light: #04342C;
+      --primary-mid: #5DCAA5;
+      --amber-bg: #412402;
+      --amber-text: #FAC775;
+      --gray-bg: #2C2C2A;
+      --gray-text: #B4B2A9;
+      --bg: #121212;
+      --card: #1e1e1e;
+      --border: rgba(255,255,255,0.08);
+      --border-hover: rgba(255,255,255,0.18);
+      --text: #f0f0f0;
+      --muted: #9ca3af;
+    }
+  }
+
+  body {
+    font-family: 'Segoe UI', 'PingFang TC', 'Noto Sans TC', 'Helvetica Neue', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  header {
+    background: var(--primary);
+    color: #fff;
+    padding: 28px 24px 24px;
+  }
+  .header-inner {
+    max-width: 860px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .header-logo {
+    font-size: 2rem;
+    line-height: 1;
+  }
+  .header-text h1 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+  .header-text p {
+    font-size: 0.8rem;
+    opacity: 0.75;
+    margin-top: 3px;
+  }
+
+  /* ── Main ── */
+  main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 28px 16px 60px;
+  }
+
+  /* ── Section label ── */
+  .section-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 28px 0 12px;
+  }
+  .section-label:first-child { margin-top: 0; }
+
+  /* ── Grid ── */
+  .survey-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 12px;
+  }
+
+  /* ── Card ── */
+  .survey-card {
+    background: var(--card);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .survey-card:hover {
+    border-color: var(--border-hover);
+  }
+
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .card-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: var(--radius-md);
+    background: var(--primary-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1.15rem;
+  }
+  .card-icon.gray { background: var(--gray-bg); }
+
+  .card-title {
+    font-size: 0.88rem;
+    font-weight: 600;
+    line-height: 1.45;
+    color: var(--text);
+    margin-bottom: 3px;
+  }
+  .card-desc {
+    font-size: 0.75rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .card-meta {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-wrap: wrap;
+  }
+  .badge {
+    font-size: 0.68rem;
+    font-weight: 600;
+    padding: 2px 9px;
+    border-radius: 99px;
+  }
+  .badge-active { background: var(--primary-light); color: var(--primary); }
+  .badge-closed { background: var(--gray-bg); color: var(--gray-text); }
+  .badge-draft  { background: var(--amber-bg); color: var(--amber-text); }
+
+  .meta-date {
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+
+  /* ── Button ── */
+  .card-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 0;
+    border-radius: var(--radius-md);
+    border: 0.5px solid var(--border-hover);
+    background: transparent;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text);
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.15s;
+    margin-top: auto;
+  }
+  .card-btn:hover { background: var(--primary-light); border-color: var(--primary); color: var(--primary); }
+  .card-btn.disabled {
+    opacity: 0.4;
+    pointer-events: none;
+    cursor: default;
+  }
+
+  /* ── Footer ── */
+  footer {
+    text-align: center;
+    padding: 20px 16px 32px;
+    font-size: 0.72rem;
+    color: var(--muted);
+    border-top: 0.5px solid var(--border);
+  }
+  footer a { color: var(--primary); text-decoration: none; }
+
+  /* ── Empty state ── */
+  .empty {
+    grid-column: 1 / -1;
+    padding: 24px;
+    text-align: center;
+    font-size: 0.82rem;
+    color: var(--muted);
+    border: 0.5px dashed var(--border-hover);
+    border-radius: var(--radius-lg);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="header-logo">🚑</div>
+    <div class="header-text">
+      <h1>EMS 研究問卷平台</h1>
+      <p>EMS Survey Portal · drjackchang.github.io/surveys</p>
+    </div>
+  </div>
+</header>
+
+<main id="main"></main>
+
+<footer>
+  <p>EMS問卷平台 · 國立臺北護理健康大學健康科技學院/TSP台灣醫療救護學會 &nbsp;|&nbsp; <a href="https://github.com/twparamed" target="_blank" rel="noopener">GitHub: drjackchang</a></p>
+  <p style="margin-top:5px">所有問卷均採完全匿名，資料僅用於學術研究。</p>
+</footer>
+
+<script src="surveys.js"></script>
+<script>
+  function formatDate(str) {
+    // '2026/05/30' → '2026/5/30'
+    return str.replace(/\/(0)(\d)/g, '/$2');
+  }
+
+  function statusLabel(status, lang) {
+    if (status === 'active') return '<span class="badge badge-active">收案中</span>';
+    if (status === 'closed') return '<span class="badge badge-closed">已結束</span>';
+    return '<span class="badge badge-draft">即將開放</span>';
+  }
+
+  function isActive(s) {
+  const today = new Date();
+  const start = new Date(s.start.replace(/\//g, '-'));
+  const end   = new Date(s.end.replace(/\//g, '-'));
+  end.setHours(23, 59, 59);
+  return today >= start && today <= end;
+}
+function isClosed(s) {
+  const end = new Date(s.end.replace(/\//g, '-'));
+  end.setHours(23, 59, 59);
+  return new Date() > end;
+}
+function isDraft(s) {
+  const start = new Date(s.start.replace(/\//g, '-'));
+  return new Date() < start;
+}
+
+  function cardHTML(s) {
+    const iconColor = (s.status === 'closed') ? 'gray' : '';
+    const btnDisabled = (s.status !== 'active') ? 'disabled' : '';
+    const btnText = s.status === 'active' ? '開啟問卷 ↗' : (s.status === 'closed' ? '收案已結束' : '尚未開放');
+    const period = `${formatDate(s.start)} — ${formatDate(s.end)}`;
+
+    return `
+    <div class="survey-card">
+      <div class="card-top">
+        <div class="card-icon ${iconColor}">
+          ${iconEmoji(s.icon)}
+        </div>
+        <div>
+          <div class="card-title">${s.title}</div>
+          <div class="card-desc">${s.desc}</div>
+        </div>
+      </div>
+      <div class="card-meta">
+        ${statusLabel(s.status)}
+        <span class="meta-date">📅 ${period}</span>
+        ${s.lang ? `<span class="meta-date">🌐 ${s.lang}</span>` : ''}
+      </div>
+      <a class="card-btn ${btnDisabled}" href="${s.url}" target="_blank" rel="noopener">
+        ${btnText}
+      </a>
+    </div>`;
+  }
+
+  function iconEmoji(icon) {
+    const map = {
+      'ti-stethoscope': '🩺',
+      'ti-file-description': '📋',
+      'ti-brain': '🧠',
+      'ti-chart-bar': '📊',
+      'ti-heart': '❤️',
+    };
+    return map[icon] || '📝';
+  }
+
+  function render() {
+    const main = document.getElementById('main');
+    const active = SURVEYS.filter(isActive);
+    const closed = SURVEYS.filter(isClosed);
+    const draft  = SURVEYS.filter(isDraft);
+
+    let html = '';
+
+    if (active.length || draft.length) {
+      html += `<div class="section-label">收案中 / 即將開放</div>`;
+      html += `<div class="survey-grid">`;
+      [...active, ...draft].forEach(s => { html += cardHTML(s); });
+      if (active.length + draft.length === 0) html += `<div class="empty">目前沒有開放中的問卷</div>`;
+      html += `</div>`;
+    }
+
+    if (closed.length) {
+      html += `<div class="section-label">已結束</div>`;
+      html += `<div class="survey-grid">`;
+      closed.forEach(s => { html += cardHTML(s); });
+      html += `</div>`;
+    }
+
+    if (!active.length && !draft.length && !closed.length) {
+      html = `<div class="empty" style="margin-top:2rem">目前沒有問卷資料</div>`;
+    }
+
+    main.innerHTML = html;
+  }
+
+  render();
+</script>
+</body>
+</html>
