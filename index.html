@@ -225,8 +225,8 @@
   <div class="header-inner">
     <div class="header-logo">🚑</div>
     <div class="header-text">
-      <h1>EMS 研究問卷平台</h1>
-      <p>EMS Survey Portal · drjackchang.github.io/surveys</p>
+      <h1>EMS 研究問卷平台 <span style="font-weight:400;opacity:0.85">· EMS Research Survey Portal</span></h1>
+      <p>社團法人台灣醫療救護學會 · Taiwan Society of Prehospital Emergency Medicine · drjackchang.github.io/surveys</p>
     </div>
   </div>
 </header>
@@ -234,8 +234,9 @@
 <main id="main"></main>
 
 <footer>
-  <p>EMS問卷平台 · 國立臺北護理健康大學健康科技學院/TSP台灣醫療救護學會 &nbsp;|&nbsp; <a href="https://github.com/twparamed" target="_blank" rel="noopener">GitHub: drjackchang</a></p>
-  <p style="margin-top:5px">所有問卷均採完全匿名，資料僅用於學術研究。</p>
+  <p>EMS問卷平台 · 國立臺北護理健康大學健康科技學院 / 社團法人台灣醫療救護學會</p>
+  <p style="margin-top:3px">EMS Survey Portal · National Taipei University of Nursing and Health Sciences / TSPEM &nbsp;|&nbsp; <a href="https://github.com/twparamed" target="_blank" rel="noopener">GitHub: drjackchang</a></p>
+  <p style="margin-top:5px">所有問卷均採完全匿名，資料僅用於學術研究。· All surveys are anonymous and for academic research only.</p>
 </footer>
 
 <script src="surveys.js"></script>
@@ -246,10 +247,10 @@
   }
 
   function statusLabel(s) {
-  if (isDraft(s))  return '<span class="badge badge-draft">尚未開始</span>';
-  if (isClosed(s)) return '<span class="badge badge-closed">已截止</span>';
-  return '<span class="badge badge-active">收案中</span>';
-}
+    if (isDraft(s))  return '<span class="badge badge-draft">尚未開始 · Upcoming</span>';
+    if (isClosed(s)) return '<span class="badge badge-closed">已截止 · Closed</span>';
+    return '<span class="badge badge-active">收案中 · Active</span>';
+  }
 
   function isActive(s) {
   const today = new Date();
@@ -271,7 +272,7 @@ function isDraft(s) {
   function cardHTML(s) {
     const iconColor = (s.status === 'closed') ? 'gray' : '';
     const btnDisabled = !isActive(s) ? 'disabled' : '';
-const btnText = isActive(s) ? '開啟問卷 ↗' : isClosed(s) ? '收案已截止' : '尚未開放';
+    const btnText = isActive(s) ? '開啟問卷 · Take Survey ↗' : isClosed(s) ? '收案已截止 · Closed' : '尚未開放 · Not yet open';
     const period = `${formatDate(s.start)} — ${formatDate(s.end)}`;
 
     return `
@@ -282,12 +283,15 @@ const btnText = isActive(s) ? '開啟問卷 ↗' : isClosed(s) ? '收案已截�
         </div>
         <div>
           <div class="card-title">${s.title}</div>
+          ${s.titleEn ? `<div class="card-title" style="font-weight:400;font-size:0.8rem;color:var(--muted)">${s.titleEn}</div>` : ''}
           <div class="card-desc">${s.desc}</div>
+          ${s.descEn ? `<div class="card-desc">${s.descEn}</div>` : ''}
         </div>
       </div>
       <div class="card-meta">
         ${statusLabel(s)}
         <span class="meta-date">📅 ${period}</span>
+        ${s.pi ? `<span class="meta-date">👤 ${s.pi}${s.piEn ? ` · ${s.piEn}` : ''}</span>` : ''}
         ${s.lang ? `<span class="meta-date">🌐 ${s.lang}</span>` : ''}
       </div>
       <a class="card-btn ${btnDisabled}" href="${s.url}" target="_blank" rel="noopener">
@@ -316,7 +320,7 @@ const btnText = isActive(s) ? '開啟問卷 ↗' : isClosed(s) ? '收案已截�
     let html = '';
 
     if (active.length || draft.length) {
-      html += `<div class="section-label">收案中 / 即將開放</div>`;
+      html += `<div class="section-label">收案中 / 即將開放 &nbsp;·&nbsp; Active / Upcoming</div>`;
       html += `<div class="survey-grid">`;
       [...active, ...draft].forEach(s => { html += cardHTML(s); });
       if (active.length + draft.length === 0) html += `<div class="empty">目前沒有開放中的問卷</div>`;
@@ -324,7 +328,7 @@ const btnText = isActive(s) ? '開啟問卷 ↗' : isClosed(s) ? '收案已截�
     }
 
     if (closed.length) {
-      html += `<div class="section-label">已結束</div>`;
+      html += `<div class="section-label">已結束 · Closed</div>`;
       html += `<div class="survey-grid">`;
       closed.forEach(s => { html += cardHTML(s); });
       html += `</div>`;
