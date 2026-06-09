@@ -17,11 +17,11 @@ const SURVEYS = [
   },
   {
     id: 'ems-dnr',
-    title: 'EMS DNR 相關調查',
+    title: 'EMS DNR 相關調查(PEACE Study)',
     titleEn: 'EMS DNR Survey',
     desc: '救護現場 DNR 執行相關議題調查 · IRB: ECKIRB1150308',
     descEn: 'DNR decision-making in prehospital EMS settings',
-    url: 'https://script.google.com/macros/s/AKfycbzL9yXMADWUZXdO6TCBUMqtI4mlUST6UmIvCn3VZZ1K67Qk-ts4jziGMHJhGeRCUm4_Mg/exec',
+    url: 'https://drjackchang.github.io/peace/',
     start: '2026/05/26',
     end: '2026/06/30',
     icon: 'ti-file-description',
