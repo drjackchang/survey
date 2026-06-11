@@ -311,22 +311,7 @@
 <body>
 <div class="page-wrap">
 
-  <!-- ── 開發者提示 ── -->
-  <div class="dev-note">
-    ⚙️ <strong>部署前請完成：</strong>
-    在 Google Sheets 建立試算表 → 工具 → Apps Script → 貼上 GAS 接收程式碼（見下方）→ 部署為「網路應用程式」→ 將取得的 URL 填入下方 JavaScript 的 <code>GAS_URL</code> 變數。完成後刪除此提示框。
-    <br><br>
-    <strong>GAS 接收程式碼：</strong><br>
-    <code>function doPost(e) {</code><br>
-    <code>&nbsp;&nbsp;var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();</code><br>
-    <code>&nbsp;&nbsp;var data = JSON.parse(e.postData.contents);</code><br>
-    <code>&nbsp;&nbsp;var row = Object.values(data);</code><br>
-    <code>&nbsp;&nbsp;sheet.appendRow(row);</code><br>
-    <code>&nbsp;&nbsp;return ContentService.createTextOutput("ok");</code><br>
-    <code>}</code>
-  </div>
-
-  <!-- ── 頁首 ── -->
+    <!-- ── 頁首 ── -->
   <div class="survey-header">
     <p class="eyebrow">Delphi Round 1 ｜ 專家共識問卷</p>
     <h1>台灣災難救援 NGO AI 就緒度評估指標建構研究</h1>
