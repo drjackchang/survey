@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <style>
+    :root { --primary: #1a73e8; --bg: #f4f6f9; --text: #333; }
+    body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 15px; color: var(--text); line-height: 1.6; transition: all 0.3s ease;}
+    .container { max-width: 800px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+
+    /* Header (language dropdown removed — language is now chosen up front) */
+    .header-bar { display: flex; justify-content: center; align-items: center; border-bottom: 2px solid var(--primary); padding-bottom: 15px; margin-bottom: 25px;}
+
+    /* Language-first screen */
+    .lang-screen { max-width: 640px; margin: 60px auto; text-align: center; background: #fff; padding: 40px 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+    .lang-screen h2 { color: var(--primary); font-size: 1.3rem; margin-bottom: 8px; }
+    .lang-screen p { color: #666; font-size: 0.9rem; margin-bottom: 30px; }
+    .lang-btns { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
+    .lang-select-btn { padding: 14px 28px; border-radius: 8px; border: 2px solid var(--primary); background: #fff; color: var(--primary); font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.15s; min-width: 140px; }
+    .lang-select-btn:hover { background: var(--primary); color: #fff; }
+
+    /* Intro Screen Specifics */
+    .intro-section { margin-bottom: 20px; }
+    .intro-title { color: var(--primary); font-size: 18px; margin-bottom: 5px; border-bottom: 1px solid #eee; padding-bottom: 5px; font-weight: bold;}
+    .irb-box { background: #e8f0fe; border-left: 4px solid #1a73e8; padding: 12px 15px; margin-top: 15px; border-radius: 4px; }
+    .consent-box { background: #fff9e6; border-left: 4px solid #fbbc05; padding: 15px; margin-top: 20px; border-radius: 4px; }
+    .btn-group { display: flex; gap: 15px; margin-top: 30px; }
+    .btn-agree { flex: 1; padding: 15px; background: #34a853; color: white; border: none; font-size: 16px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.2s;}
+    .btn-agree:hover { background: #2b803e; }
+    .btn-decline { flex: 1; padding: 15px; background: #fff; color: #d93025; border: 2px solid #d93025; font-size: 16px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.2s;}
+    .btn-decline:hover { background: #fce8e6; }
+
+    /* Survey Main Specifics */
+    .section-title { color: #fff; background: var(--primary); padding: 10px 15px; border-radius: 5px; margin-top: 30px; font-size: 18px;}
+    .question-block { margin-bottom: 20px; padding: 20px; background: #fafafa; border: 1px solid #ddd; border-radius: 6px; }
+    .vignette-box { background: #e8f0fe; padding: 20px; border-inline-start: 5px solid var(--primary); margin-bottom: 20px; font-size: 15px; color:#202124;}
+    label.q-title { font-weight: bold; display: block; margin-bottom: 12px; font-size: 16px;}
+    .radio-group label { display: block; margin-bottom: 8px; cursor: pointer; padding: 6px; border-radius: 4px;}
+    .radio-group label:hover { background: #eef2f5; }
+    select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit; box-sizing: border-box;}
+    .likert { display: flex; justify-content: space-between; text-align: center; margin-top: 15px;}
+    .likert label { width: 19%; font-size: 13px; cursor: pointer;}
+    .btn-submit { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; font-size: 18px; border-radius: 5px; cursor: pointer; margin-top: 35px; font-weight: bold;}
+    .btn-submit:hover { background: #1557b0; }
+
+    /* End Screens */
+    .end-screen { text-align: center; padding: 60px 20px; }
+    .end-screen h2 { font-size: 28px; margin-bottom: 15px; }
+    #thankYouScreen h2 { color: #34a853; }
+    #declineScreen h2 { color: #d93025; }
+  </style>
+</head>
+<body>
+
+  <!-- LANGUAGE-FIRST SCREEN -->
+  <div id="langScreen" class="lang-screen">
+    <h2>🌐 Please select your language / 請選擇語言 / 言語を選択してください / 언어를 선택하세요 / اختر اللغة</h2>
+    <p>You will use this language throughout the survey / 選擇後將全程以該語言顯示</p>
+    <div class="lang-btns">
+      <button class="lang-select-btn" onclick="selectLanguage('en')">English</button>
+      <button class="lang-select-btn" onclick="selectLanguage('zh')">繁體中文</button>
+      <button class="lang-select-btn" onclick="selectLanguage('ja')">日本語</button>
+      <button class="lang-select-btn" onclick="selectLanguage('ko')">한국어</button>
+      <button class="lang-select-btn" onclick="selectLanguage('ar')">العربية</button>
+    </div>
+  </div>
+
+  <div class="container" id="mainContainer" style="display:none;">
+
+    <div class="header-bar" id="headerBar">
+      <h1 id="t_main" style="font-size: 20px; margin:0; color: var(--primary);">End-of-Life Care Survey</h1>
+    </div>
+
+    <!-- INTRO SCREEN -->
+    <div id="introScreen">
+      <h2 class="section-title" id="t_sec1" style="margin-top:0;">Section 1: Introduction & Informed Consent</h2>
+
+      <div class="intro-section">
+        <div class="intro-title" id="t_proj_title_lbl">Project Title</div>
+        <div id="t_proj_title" style="font-weight: bold;">Prehospital End-of-Life Autonomy, Culture and Ethics</div>
+      </div>
+
+      <div class="intro-section">
+        <div class="intro-title" id="t_pi_lbl">Principal Investigators</div>
+        <div id="t_pi" style="white-space: pre-wrap; line-height: 1.4;"></div>
+      </div>
+
+      <div class="intro-section">
+        <div class="intro-title" id="t_desc_lbl">Description</div>
+        <div id="t_desc"></div>
+      </div>
+
+      <div class="intro-section">
+        <div class="intro-title" id="t_conf_lbl">Confidentiality &amp; Ethics</div>
+        <ul id="t_conf_list" style="margin-top:5px; padding-inline-start: 20px;"></ul>
+      </div>
+
+      <div class="irb-box">
+        <div class="intro-title" id="t_irb_lbl" style="border:none; margin-bottom: 0;">IRB Approval</div>
+        <div id="t_irb_text" style="font-weight: bold; color: #1a73e8; margin-top: 5px;"></div>
+      </div>
+
+      <div class="intro-section" style="margin-top:15px;">
+        <div class="intro-title" id="t_elig_lbl">Eligibility</div>
+        <div id="t_elig_text"></div>
+      </div>
+
+      <div class="consent-box">
+        <div class="intro-title" id="t_consent_lbl" style="border:none; color:#d93025; margin-bottom: 5px;">Consent</div>
+        <div id="t_consent_text"></div>
+        <div class="btn-group">
+          <button class="btn-agree" onclick="startSurvey()" id="btn_agree">I Agree to participate</button>
+          <button class="btn-decline" onclick="declineSurvey()" id="btn_decline">I Decline</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SURVEY MAIN -->
+    <div id="surveyMain" style="display: none;">
+      <form id="surveyForm">
+
+        <!-- Section 2: Demographics -->
+        <h2 class="section-title" id="t_sec2"></h2>
+        <div id="demo_container"></div>
+
+        <!-- Section 3: Clinical Vignettes -->
+        <h2 class="section-title" id="t_sec3"></h2>
+        <div id="vignette_container"></div>
+
+        <!-- Section 4: Legal Confidence Scale -->
+        <h2 class="section-title" id="t_sec4"></h2>
+        <div id="legal_container"></div>
+
+        <!-- Section 5: Modified PARPACT -->
+        <h2 class="section-title" id="t_sec5"></h2>
+        <p id="t_sec5_desc" style="font-size: 14px; font-weight:bold;"></p>
+        <div id="parpact_container"></div>
+
+        <!-- Section 6: Moral Distress Scale -->
+        <h2 class="section-title" id="t_sec6"></h2>
+        <p id="t_sec6_desc" style="font-size: 14px; font-weight:bold;"></p>
+        <div id="mds_container"></div>
+
+        <!-- Section 7: Open Comments -->
+        <h2 class="section-title" id="t_sec7"></h2>
+        <div class="question-block">
+          <label class="q-title" id="t_q7_1"></label>
+          <textarea name="q6_1" rows="4"></textarea>
+        </div>
+
+        <button type="button" class="btn-submit" onclick="submitForm()" id="btn_submit">Submit</button>
+      </form>
+    </div>
+
+    <!-- DECLINE SCREEN -->
+    <div id="declineScreen" class="end-screen" style="display: none;">
+      <h2 id="msg_decline_title">Survey Declined</h2>
+      <p id="msg_decline_text">Thank you for your time. You have chosen not to participate in this study. You may safely close this window.</p>
+    </div>
+
+    <!-- THANK YOU SCREEN -->
+    <div id="thankYouScreen" class="end-screen" style="display: none;">
+      <h2 id="msg_thanks_title">Thank You!</h2>
+      <p id="msg_thanks_text">Your response has been successfully recorded. We deeply appreciate your contribution to this study.</p>
+    </div>
+
+  </div>
+
+<script>
+    // ============================================================
+    // CONFIG — 貼上你部署後拿到的 GAS Web App 網址
+    // 部署方式: GAS 專案 → 部署 → 新增部署作業 → 類型:網頁應用程式
+    //           執行身分:我 / 誰可以存取:任何人
+    // ============================================================
+    const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzL9yXMADWUZXdO6TCBUMqtI4mlUST6UmIvCn3VZZ1K67Qk-ts4jziGMHJhGeRCUm4_Mg/exec';
+
+    // ─── Principal Investigator Info ───────────────────────────────────────
+    const piInformation = "Dr Yu-Tung Chang\nCollege of Health Technology\nNational Taipei University of Nursing and Health Sciences\nEmail: yutung@ntunhs.edu.tw\n\nProfessor Brett Williams PhD, FACP\nDepartment of Paramedicine\nMonash University, Australia\n\nAssociate Professor Linda Ross\nSchool of Nursing and Midwifery\nFederation University, Australia";
+
+    // ─── FULL 5-LANGUAGE TRANSLATION DICTIONARY ───────────────────────────
+    const translations = {
+
+      // ── ENGLISH ──────────────────────────────────────────────────────────
+      en: {
+        t_main: "Prehospital End-of-Life Care Survey",
+        t_sec1: "Section 1: Introduction & Informed Consent",
+        t_proj_title_lbl: "Project Title",
+        t_proj_title: "Prehospital End-of-Life Autonomy, Culture and Ethics",
+        t_pi_lbl: "Principal Investigators",
+        t_pi: piInformation,
+        t_desc_lbl: "Description",
+        t_desc: "You are invited to participate in a research study comparing how EMS providers across different cultures make decisions regarding termination of resuscitation and DNACPR orders. This survey explores the conflict between legal protocols, family pressures and cultural values.",
+        t_conf_lbl: "Confidentiality & Ethics",
+        t_conf_list: "<li>Participation is voluntary and anonymous.</li><li>No personally identifiable information (e.g. names or IP addresses) will be reported.</li><li>The estimated completion time is 8-10 minutes.</li><li>Data will be used for academic analysis only.</li>",
+        t_irb_lbl: "IRB Approval",
+        t_irb_text: "This study has been approved by the Institutional Review Board (Approval Number: ECKIRB1150308).",
+        t_elig_lbl: "Eligibility",
+        t_elig_text: "By proceeding, you confirm that you are currently a certified EMS provider (such as an EMT, paramedic, nurse, or physician equivalent) and that you are active in prehospital care.",
+        t_consent_lbl: "Consent",
+        t_consent_text: "I have read and understood the study information provided above. By proceeding, I voluntarily agree to participate in this research.",
+        btn_agree: "I Agree to participate",
+        btn_decline: "I Decline",
+        msg_decline_title: "Survey Declined",
+        msg_decline_text: "Thank you for your time. You have chosen not to participate in this study. You may safely close this window.",
+        msg_thanks_title: "Thank You!",
+        msg_thanks_text: "Your response has been successfully recorded. We deeply appreciate your contribution to this study.",
+
+        t_sec2: "Section 2: Demographic Information",
+        t_sec3: "Section 3: Clinical Vignettes",
+        t_sec3_inst: "Please read each scenario carefully. Assume you are the lead clinician on scene. Answer based on the reality of your working environment — what you would most likely do — not only what a textbook says.",
+        t_sec4: "Section 4: Legal Confidence Scale",
+        t_sec5: "Section 5: Modified PARPACT — Competence and Attitudes",
+        t_sec5_desc: "Part A: Rate your level of confidence. (1 = Very low confidence; 5 = Very high confidence)",
+        t_sec6: "Section 6: Moral Distress Scale for EMS Personnel",
+        t_sec6_desc: "In my prehospital practice, I feel distressed because… (1 = Never; 5 = Very frequently)",
+        t_sec7: "Section 7: Open Comments",
+        t_q7_1: "Is there a specific case or barrier regarding end-of-life care that sticks in your mind?",
+        btn_submit: "Submit Survey",
+
+        lk_5: ["1<br>Strongly Disagree", "2<br>Disagree", "3<br>Neutral", "4<br>Agree", "5<br>Strongly Agree"],
+        lk_conf: ["1<br>Very Low", "2", "3", "4", "5<br>Very High"],
+        lk_tf: ["True", "False", "Unsure"],
+        lk_mds: ["1<br>Never", "2<br>Rarely", "3<br>Sometimes", "4<br>Frequently", "5<br>Very Frequently"],
+
+        demo: [
+          { name: "country", q: "1. Country of Practice:", opts: ["Taiwan", "South Korea", "Japan", "Saudi Arabia", "Jordan", "UK", "USA", "Australia", "Canada", "Other"] },
+          { name: "cert_level", q: "2. Current Certification Level:", opts: [
+            "EMT-Basic / EMT-1",
+            "EMT-Intermediate / EMT-2 / AEMT",
+            "Paramedic / EMT-P",
+            "Nurse / Physician (prehospital)",
+            "Other"
+          ]},
+          { name: "experience", q: "3. Years of Experience in EMS:", opts: ["Less than 1 year", "1–5 years", "6–10 years", "11–15 years", "More than 15 years"] },
+          { name: "education", q: "4. Highest Education Level:", opts: ["High school / vocational training", "Associate degree / diploma", "Bachelor degree", "Master degree or higher"] },
+          { name: "pall_training", q: "5. Have you received specific training in palliative care?", opts: ["No, never", "Yes, brief mention in initial training (< 4 hours)", "Yes, specialised continuing education course (> 4 hours)"] },
+          { name: "religion", q: "6. Religious Affiliation:", opts: ["None / atheist / agnostic", "Buddhism / Taoism", "Islam", "Christianity (Protestant / Catholic)", "Other"] }
+        ],
+
+        vignettes: [
+          {
+            title: "Scenario 1: Valid DNACPR vs Family Conflict",
+            desc: "<b>The scene:</b> You arrive at the home of a 78-year-old male with terminal lung cancer who is in cardiac arrest.<br><br><b>The document:</b> A valid DNACPR (Do Not Attempt CPR) form is presented and confirmed.<br><br><b>The conflict:</b> The patient's son is extremely emotional, crying, and aggressively demands: <em>\"Save my father! Do CPR now or I will sue you!\"</em>",
+            q1: "Q1.1 What is your immediate action?",
+            opts1: ["Start full CPR immediately and transport.", "Perform a \"slow code\" (symbolic/ineffective CPR) to calm the family, then transport.", "Withhold CPR and follow the DNACPR order.", "Negotiate first, but if the family persists, start CPR."],
+            q2: "Q1.2 I am confident that my legal system would protect me if I refused to start CPR in this situation."
+          },
+          {
+            title: "Scenario 2: No Document vs \"Let Him Go\"",
+            desc: "<b>The scene:</b> An 85-year-old female with severe dementia and multiple organ failure is found pulseless in bed. She is frail and bedridden.<br><br><b>The document:</b> No physical DNACPR form is found on scene.<br><br><b>The conflict:</b> The family calmly tells you: <em>\"She has suffered enough. We all agreed to let her go. Please do not torture her with CPR.\"</em>",
+            q1: "Q2.1 What is your immediate action?",
+            opts1: ["Start CPR immediately because there is no paper documentation.", "Withhold CPR based on the family's verbal request and clinical judgement.", "Contact online medical control / physician for authorisation to stop."],
+            q2: "Q2.2 I fear legal liability if I stop CPR based only on a verbal request."
+          },
+          {
+            title: "Scenario 3: System Pressure and Public Scrutiny",
+            desc: "<b>The scene:</b> A cardiac arrest occurs in a public area. The patient appears terminally ill and has a valid DNACPR.<br><br><b>The pressure:</b> Bystanders are filming you with smartphones. Your dispatch centre radios: <em>\"We are getting calls about this. Family is difficult. Just transport to avoid complaints / media issues.\"</em>",
+            q1: "Q3.1 What is your immediate action?",
+            opts1: ["Follow dispatch orders: start CPR and transport to avoid trouble.", "Perform a \"show code\": pretend to resuscitate while loading the patient.", "Stand your ground: refuse to start CPR, citing the valid DNACPR despite the pressure."],
+            q2: "Q3.2 My organisation supports me when I make ethically correct but unpopular decisions."
+          }
+        ],
+
+        legal: [
+          "1. I understand the legal status of DNACPR orders in my jurisdiction.",
+          "2. I understand my authority to withhold CPR.",
+          "3. I fear disciplinary action if I honour a DNACPR order.",
+          "4. My organisation would support me if a complaint was made."
+        ],
+
+        parpact_conf: [
+          "1. I feel confident in breaking bad news / death notification to the family.",
+          "2. I feel confident in managing an angry family member who disagrees with my decision.",
+          "3. I feel confident in explaining the signs of dying, such as agonal breathing, to the family.",
+          "4. I feel confident in determining when resuscitation is medically futile.",
+          "5. I feel confident in dealing with the cultural or religious needs of a dying patient's family."
+        ],
+
+        mds: [
+          "1. I am forced to perform CPR on a patient who I know has no chance of survival.",
+          "2. I have to initiate CPR solely to prevent legal consequences (defensive medicine).",
+          "3. I have to follow family demands even when they are contrary to medical indications.",
+          "4. I engage in slow codes or show codes (deceptive resuscitation) to satisfy those present.",
+          "5. I witness patients receiving painful interventions that only prolong their dying process.",
+          "6. I lack the legal authority to stop resuscitation even when I know it is futile.",
+          "7. I am ordered by a physician or dispatcher to perform actions I believe are unethical.",
+          "8. I have to perform CPR in unsafe or undignified environments (e.g. crowded public spaces) where privacy is impossible.",
+          "9. I cannot provide adequate emotional support to the family due to time pressure or dispatch requirements.",
+          "10. I feel my organisation prioritises avoiding complaints over patient dignity.",
+          "11. I am forced to transport a patient who should have been allowed to die at home.",
+          "12. I see valid DNACPR orders being ignored due to family conflict.",
+          "13. I lack sufficient training to manage end-of-life symptoms, such as dyspnoea or agitation.",
+          "14. I feel helpless when communicating with grieving families.",
+          "15. I am worried about being recorded or filmed by bystanders while making ethical decisions.",
+          "16. I feel a conflict between my personal values and professional protocols.",
+          "17. I have to leave the family alone with the deceased without proper handover or support.",
+          "18. I observe colleagues acting in ways that disregard the patient's dignity.",
+          "19. I feel the EMS system does not recognise providing a good death as a measure of success.",
+          "20. I carry the emotional burden of these resuscitation decisions home with me."
+        ]
+      },
+
+      // ── 繁體中文 ──────────────────────────────────────────────────────────
+      zh: {
+        t_main: "院前臨終照護決策跨國調查",
+        t_sec1: "第一部分：介紹與知情同意",
+        t_proj_title_lbl: "計畫名稱",
+        t_proj_title: "院前臨終自主、文化與倫理",
+        t_pi_lbl: "計畫主持人",
+        t_pi: piInformation,
+        t_desc_lbl: "研究說明",
+        t_desc: "誠摯邀請您參與這項跨國研究，比較不同文化背景的救護人員如何面對急救終止（TOR）與 DNACPR 的決策。本問卷探討法律規範、家屬壓力與文化價值觀之間的衝突。",
+        t_conf_lbl: "保密與倫理",
+        t_conf_list: "<li>參與純屬自願且匿名。</li><li>不會報告任何個人可識別資訊（如 IP 位址、姓名）。</li><li>預計填寫時間為 8-10 分鐘。</li><li>資料將專供學術分析使用。</li>",
+        t_irb_lbl: "倫理審查 (IRB) 核准",
+        t_irb_text: "本研究已通過人體研究倫理審查委員會核准（核准字號：ECKIRB1150308）。",
+        t_elig_lbl: "參與資格",
+        t_elig_text: "繼續填答即表示您確認目前為認證的院前緊急醫療救護提供者（如 EMT、救護技術員、護理師或同等資格醫師），且正在從事院前醫療工作。",
+        t_consent_lbl: "同意聲明",
+        t_consent_text: "我已閱讀並理解上述研究資訊。繼續作答即表示我出於自願，同意參與本項研究。",
+        btn_agree: "我同意參與（開始作答）",
+        btn_decline: "我不同意參與",
+        msg_decline_title: "已終止作答",
+        msg_decline_text: "感謝您的時間。您已選擇不同意參與本研究，您可以安全地關閉此視窗。",
+        msg_thanks_title: "感謝填寫！",
+        msg_thanks_text: "您的回覆已成功記錄。我們非常感謝您對本研究的寶貴貢獻。",
+
+        t_sec2: "第二部分：基本資料",
+        t_sec3: "第三部分：臨床情境",
+        t_sec3_inst: "請仔細閱讀每個情境。假設您是現場的主責救護員，根據您實際工作環境中最有可能採取的行動作答，而非僅依教科書回答。",
+        t_sec4: "第四部分：法律信心量表",
+        t_sec5: "第五部分：PARPACT 修訂版 — 能力與態度",
+        t_sec5_desc: "Part A：請評估您的自信程度（1 = 非常低；5 = 非常高）",
+        t_sec6: "第六部分：EMS 道德困擾量表（MDS-EMS）",
+        t_sec6_desc: "在院前實務中，我感到困擾因為…（1 = 從未；5 = 總是如此）",
+        t_sec7: "第七部分：開放回饋",
+        t_q7_1: "是否有特定案件或障礙（與臨終照護相關）讓您耿耿於懷？",
+        btn_submit: "送出問卷",
+
+        lk_5: ["1<br>非常不同意", "2<br>不同意", "3<br>普通", "4<br>同意", "5<br>非常同意"],
+        lk_conf: ["1<br>非常低", "2", "3", "4", "5<br>非常高"],
+        lk_tf: ["對", "錯", "不確定"],
+        lk_mds: ["1<br>從未", "2<br>很少", "3<br>有時", "4<br>經常", "5<br>總是如此"],
+
+        demo: [
+          { name: "country", q: "1. 執業國家：", opts: ["台灣", "韓國", "日本", "沙烏地阿拉伯", "約旦", "英國", "美國", "澳洲", "加拿大", "其他"] },
+          { name: "cert_level", q: "2. 最高執業級別：", opts: ["EMT-Basic / EMT-1（初級救護技術員）", "EMT-Intermediate / EMT-2 / AEMT（中級）", "Paramedic / EMT-P（高級救護技術員）", "護理師 / 醫師（院前）", "其他"] },
+          { name: "experience", q: "3. 院前實務年資：", opts: ["不到 1 年", "1–5 年", "6–10 年", "11–15 年", "超過 15 年"] },
+          { name: "education", q: "4. 最高學歷：", opts: ["高中職", "專科", "學士", "碩士或以上"] },
+          { name: "pall_training", q: "5. 是否曾接受安寧緩和相關訓練？", opts: ["從未", "有（初訓中簡短提及，< 4 小時）", "有（專業繼續教育課程，> 4 小時）"] },
+          { name: "religion", q: "6. 宗教信仰：", opts: ["無 / 無神論 / 不可知論", "佛教 / 道教", "伊斯蘭教", "基督宗教（新教 / 天主教）", "其他"] }
+        ],
+
+        vignettes: [
+          {
+            title: "情境一：合法 DNACPR 與家屬衝突",
+            desc: "<b>場景：</b>您抵達一名 78 歲患有末期肺癌的男性家中，該名患者已失去心跳。<br><br><b>文件：</b>現場出示並確認了一份合法的 DNACPR（拒絕心肺復甦術）意願書。<br><br><b>衝突：</b>患者的兒子情緒非常激動、哭泣，並具有攻擊性地要求：<em>「救我爸！馬上做 CPR，不然我告死你！」</em>",
+            q1: "Q1.1 您的立即處置為何？",
+            opts1: ["立刻開始完整 CPR 並送醫。", "進行「假急救」（象徵性/無效壓胸）以安撫家屬，再送醫。", "依照 DNACPR 不予 CPR。", "先嘗試溝通，若家屬堅持則開始 CPR。"],
+            q2: "Q1.2 我有信心，若我在此情況下拒絕急救，法律會保護我。"
+          },
+          {
+            title: "情境二：無文件與「讓她走」",
+            desc: "<b>場景：</b>一名患有嚴重失智症和多重器官衰竭的 85 歲女性被發現在床上失去脈搏，身體虛弱且長期臥床。<br><br><b>文件：</b>現場找不到任何官方的紙本或數位 DNACPR 紀錄。<br><br><b>衝突：</b>家屬平靜地告訴您：<em>「她受夠苦了。我們都同意讓她走。請不要用 CPR 折磨她。」</em>",
+            q1: "Q2.1 您的立即處置為何？",
+            opts1: ["立刻開始 CPR（因無書面文件）。", "根據家屬的口頭請求及臨床判斷，不予 CPR。", "聯絡線上醫療指導 / 醫師請求授權停止急救。"],
+            q2: "Q2.2 若僅憑口頭請求就停止 CPR，我擔心面臨法律責任。"
+          },
+          {
+            title: "情境三：系統壓力與公眾審視",
+            desc: "<b>場景：</b>一名末期病患在公開場所發生心跳停止。患者明顯為末期病人且持有合法 DNACPR。<br><br><b>壓力：</b>旁觀者正以智慧型手機錄影。您的指揮中心以無線電通知：<em>「我們收到很多投訴電話。家屬很難應付。直接送醫，避免申訴 / 媒體問題。」</em>",
+            q1: "Q3.1 您的立即處置為何？",
+            opts1: ["遵從指揮中心指令：開始 CPR 並送醫以避免麻煩。", "進行「秀場式急救」：假裝急救同時將病患搬上救護車。", "堅守立場：不顧壓力，以有效的 DNACPR 為由拒絕急救。"],
+            q2: "Q3.2 當我做出符合倫理但不受歡迎的決策時，我的機構會支持我。"
+          }
+        ],
+
+        legal: [
+          "1. 我了解 DNACPR 意願書在我所在地區的法律效力。",
+          "2. 我了解自己拒絕進行 CPR 的法定權限。",
+          "3. 若我遵從 DNACPR 意願書，我擔心會受到紀律處分。",
+          "4. 若有投訴，我的機構會支持我。"
+        ],
+
+        parpact_conf: [
+          "1. 我對於向家屬宣告死亡感到自信。",
+          "2. 我對於應對不認同我決定的憤怒家屬感到自信。",
+          "3. 我對於向家屬解釋瀕死症狀（如喉鳴式呼吸）感到自信。",
+          "4. 我對於判斷何時急救已屬醫學無效感到自信。",
+          "5. 我對於處理瀕死病患家屬的文化或宗教需求感到自信。"
+        ],
+
+        mds: [
+          "1. 被迫對我知道毫無存活機會的病患進行 CPR。",
+          "2. 僅為避免法律後果（防禦性醫療）而啟動 CPR。",
+          "3. 即使違反醫療指示，仍必須遵從家屬要求。",
+          "4. 為了安撫現場人員而進行假急救或秀場式急救（欺騙性急救）。",
+          "5. 目睹病患接受只會延長死亡過程的痛苦處置。",
+          "6. 即使明知急救已屬無效，仍缺乏停止急救的法定權限。",
+          "7. 被醫師或指揮員下令執行我認為不符合倫理的行動。",
+          "8. 必須在不安全或有損尊嚴的環境（如擁擠的公共場所）中進行 CPR，毫無隱私可言。",
+          "9. 因時間壓力或指揮中心要求，無法提供家屬足夠的情感支持。",
+          "10. 感覺我的機構將避免投訴置於病患尊嚴之上。",
+          "11. 被迫將本應被允許在家中離世的病患送醫。",
+          "12. 目睹合法 DNACPR 因家屬衝突而遭到無視。",
+          "13. 缺乏足夠訓練，無法處理臨終症狀（如呼吸困難或躁動不安）。",
+          "14. 與悲傷家屬溝通時感到無助。",
+          "15. 擔心在做出倫理決定時被旁觀者錄影或拍攝。",
+          "16. 感受到個人價值觀與專業規範之間的衝突。",
+          "17. 必須在未妥善交接或提供支持的情況下將家屬單獨留在已故者旁。",
+          "18. 目睹同事的行為忽視病患尊嚴。",
+          "19. 感覺 EMS 系統不將「提供善終」視為成功的指標。",
+          "20. 將這些急救決定的情緒負擔帶回家中。"
+        ]
+      },
+
+      // ── 日本語 ────────────────────────────────────────────────────────────
+      ja: {
+        t_main: "病院前終末期ケア意思決定に関する調査",
+        t_sec1: "セクション 1: 導入とインフォームド・コンセント",
+        t_proj_title_lbl: "プロジェクトタイトル",
+        t_proj_title: "病院前終末期の自律性・文化・倫理",
+        t_pi_lbl: "主任研究員",
+        t_pi: piInformation,
+        t_desc_lbl: "研究の説明",
+        t_desc: "この調査は、異なる文化圏の救急隊員が蘇生中止（TOR）およびDNACPRについてどのように意思決定を行うかを比較するものです。本調査は、法的プロトコル、家族の圧力、文化的価値観の間の葛藤を探ります。",
+        t_conf_lbl: "機密性と倫理",
+        t_conf_list: "<li>参加は任意であり、匿名です。</li><li>個人を特定できる情報（氏名やIPアドレス等）は報告されません。</li><li>所要時間は8-10分です。</li><li>データは学術分析のみに使用されます。</li>",
+        t_irb_lbl: "倫理審査委員会 (IRB) 承認",
+        t_irb_text: "本研究は倫理審査委員会（IRB）の承認を受けています（承認番号：ECKIRB1150308）。",
+        t_elig_lbl: "参加資格",
+        t_elig_text: "参加を続けることにより、あなたは現在認定を受けたEMS提供者（EMT、救急救命士、看護師、医師等）であり、病院前ケアに従事していることを確認します。",
+        t_consent_lbl: "同意",
+        t_consent_text: "上記の説明を読み、理解しました。続行することにより、本研究への参加に自発的に同意するものとします。",
+        btn_agree: "参加に同意する",
+        btn_decline: "同意しない",
+        msg_decline_title: "参加辞退",
+        msg_decline_text: "お時間をいただきありがとうございました。参加しないことを選択されました。このウィンドウを閉じてください。",
+        msg_thanks_title: "ありがとうございました！",
+        msg_thanks_text: "回答は正常に記録されました。本研究へのご貢献に深く感謝いたします。",
+
+        t_sec2: "セクション 2: 基本情報",
+        t_sec3: "セクション 3: 臨床シナリオ",
+        t_sec3_inst: "各シナリオを注意深くお読みください。あなたが現場の主任医療従事者であると仮定し、教科書通りではなく、実際の職場環境で最もありそうな行動に基づいてお答えください。",
+        t_sec4: "セクション 4: 法的自信尺度",
+        t_sec5: "セクション 5: PARPACT修訂版 — 能力と態度",
+        t_sec5_desc: "パートA：自信の程度を評価してください（1 = 非常に低い；5 = 非常に高い）",
+        t_sec6: "セクション 6: EMS倫理的苦悩尺度（MDS-EMS）",
+        t_sec6_desc: "私の病院前実践において、以下のために苦悩を感じます…（1 = 全くない；5 = 非常に頻繁）",
+        t_sec7: "セクション 7: 自由記述",
+        t_q7_1: "終末期ケアに関して記憶に残っている特定の事例や障壁はありますか？",
+        btn_submit: "送信する",
+
+        lk_5: ["1<br>全くそう思わない", "2<br>そう思わない", "3<br>どちらでもない", "4<br>そう思う", "5<br>非常にそう思う"],
+        lk_conf: ["1<br>非常に低い", "2", "3", "4", "5<br>非常に高い"],
+        lk_tf: ["はい", "いいえ", "わからない"],
+        lk_mds: ["1<br>全くない", "2<br>まれに", "3<br>時々", "4<br>頻繁に", "5<br>非常に頻繁"],
+
+        demo: [
+          { name: "country", q: "1. 勤務国：", opts: ["台湾", "韓国", "日本", "サウジアラビア", "ヨルダン", "英国", "米国", "オーストラリア", "カナダ", "その他"] },
+          { name: "cert_level", q: "2. 現在の資格レベル：", opts: ["EMT-Basic / EMT-1", "EMT-Intermediate / EMT-2 / AEMT", "Paramedic / EMT-P", "看護師 / 医師（病院前）", "その他"] },
+          { name: "experience", q: "3. EMS経験年数：", opts: ["1年未満", "1〜5年", "6〜10年", "11〜15年", "15年以上"] },
+          { name: "education", q: "4. 最終学歴：", opts: ["高校 / 職業訓練", "短期大学 / 専門学校", "学士号", "修士号以上"] },
+          { name: "pall_training", q: "5. 緩和ケアの特別訓練を受けたことがありますか？", opts: ["いいえ、全くない", "はい、初期訓練で簡単に触れた（< 4時間）", "はい、専門的な継続教育（> 4時間）"] },
+          { name: "religion", q: "6. 宗教：", opts: ["なし / 無神論 / 不可知論", "仏教 / 道教", "イスラム教", "キリスト教", "その他"] }
+        ],
+
+        vignettes: [
+          {
+            title: "シナリオ1: 有効なDNACPRと家族の対立",
+            desc: "<b>状況：</b>末期肺がんを患う78歳の男性の自宅に到着すると、患者は心肺停止状態です。<br><br><b>文書：</b>有効なDNACPR（心肺蘇生法拒否）用紙が提示され、確認されました。<br><br><b>対立：</b>患者の息子は非常に感情的になり、泣きながら攻撃的に要求します：<em>「父を助けてくれ！今すぐCPRをしないと訴えるぞ！」</em>",
+            q1: "Q1.1 直ちにとるべき行動は？",
+            opts1: ["直ちにフルCPRを開始し搬送する。", "「スロー・コード」（象徴的/無効なCPR）を行い家族を落ち着かせてから搬送する。", "CPRを見合わせDNACPR指示に従う。", "まず交渉するが、家族が主張し続ければCPRを開始する。"],
+            q2: "Q1.2 この状況でCPRを拒否しても法律で守られる自信がある。"
+          },
+          {
+            title: "シナリオ2: 文書なしと「逝かせて」",
+            desc: "<b>状況：</b>重度の認知症と多臓器不全を患う85歳の女性がベッドで脈拍のない状態で発見されました。彼女は虚弱で寝たきりです。<br><br><b>文書：</b>公式な紙またはデジタルのDNACPR記録は見つかりません。<br><br><b>対立：</b>家族は静かにあなたに告げます：<em>「彼女は十分に苦しみました。私たちは皆、彼女を逝かせることに同意しました。CPRで彼女を苦しめないでください。」</em>",
+            q1: "Q2.1 直ちにとるべき行動は？",
+            opts1: ["書面がないため直ちにCPRを開始する。", "家族の口頭要請と臨床判断に基づきCPRを見合わせる。", "オンライン医療指示 / 医師に連絡し停止の許可を得る。"],
+            q2: "Q2.2 口頭の要請だけでCPRを見合わせると、法的責任が怖い。"
+          },
+          {
+            title: "シナリオ3: 組織の圧力と世間の目",
+            desc: "<b>状況：</b>公共の場で心肺停止が発生します。患者は末期患者と見られ、有効なDNACPRを持っています。<br><br><b>圧力：</b>周囲の人々がスマートフォンで撮影しています。指令センターは無線で連絡します：<em>「この件について多くの通報が来ています。家族が難しい。申し立て / メディア問題を避けるため搬送してください。」</em>",
+            q1: "Q3.1 直ちにとるべき行動は？",
+            opts1: ["指令の指示に従いCPRを開始し搬送する。", "「ショー・コード」を実施：搬送しながら蘇生のふりをする。", "立場を守る：圧力にもかかわらず有効なDNACPRを根拠にCPRを拒否する。"],
+            q2: "Q3.2 私の組織は、倫理的に正しいが不人気な決定を下す際に支援してくれる。"
+          }
+        ],
+
+        legal: [
+          "1. 私は自分の管轄区域におけるDNACPR指示の法的位置づけを理解している。",
+          "2. 私はCPRを差し控える自身の権限を理解している。",
+          "3. DNACPR指示を尊重した場合、懲戒処分を受けることを恐れている。",
+          "4. 申し立てがあった場合、私の組織は私を支持してくれる。"
+        ],
+
+        parpact_conf: [
+          "1. 家族への悪い知らせの告知（死亡通知）に自信がある。",
+          "2. 自分の決定に反対する怒った家族への対応に自信がある。",
+          "3. 死前喘鳴など死の兆候を家族に説明することに自信がある。",
+          "4. 蘇生が医学的に無益な時期を判断することに自信がある。",
+          "5. 臨死患者の家族の文化的・宗教的ニーズへの対応に自信がある。"
+        ],
+
+        mds: [
+          "1. 生存の見込みがないとわかっている患者にCPRを行うことを強いられる。",
+          "2. 法的責任を回避するためだけにCPRを開始しなければならない（防衛的医療）。",
+          "3. 医療上の指示に反する場合でも家族の要求に従わなければならない。",
+          "4. 場にいる人を満足させるためにスロー・コードやショー・コード（欺瞞的蘇生）を行う。",
+          "5. 患者が死亡過程を長引かせるだけの苦痛な処置を受けるのを目撃する。",
+          "6. 蘇生が無益だとわかっていても中止する法的権限がない。",
+          "7. 医師や指令担当者から非倫理的と思われる行動を実施するよう命じられる。",
+          "8. プライバシーが確保できない危険または不名誉な環境（混雑した公共場所等）でCPRを行わなければならない。",
+          "9. 時間的プレッシャーや指令センターの要件により、家族に十分な感情的サポートを提供できない。",
+          "10. 私の組織は患者の尊厳よりも申し立て回避を優先していると感じる。",
+          "11. 自宅で死を迎えるべきだった患者の搬送を強いられる。",
+          "12. 家族の対立により有効なDNACPR指示が無視されるのを目撃する。",
+          "13. 呼吸困難や興奮など終末期症状を管理するのに十分な訓練が不足している。",
+          "14. 悲しんでいる家族とのコミュニケーションに無力感を覚える。",
+          "15. 倫理的決定を下す際に周囲の人に記録または撮影されることを心配している。",
+          "16. 個人の価値観と職業上のプロトコルの間に葛藤を感じる。",
+          "17. 適切な引継ぎやサポートなしに故人と家族を二人きりにしなければならない。",
+          "18. 患者の尊厳を顧みない行動を取る同僚を目撃する。",
+          "19. EMSシステムが「良い死の提供」を成功の指標として認識していないと感じる。",
+          "20. これらの蘇生決定の感情的な重荷を家に持ち帰っている。"
+        ]
+      },
+
+      // ── 한국어 ────────────────────────────────────────────────────────────
+      ko: {
+        t_main: "병원 전 응급의료 임종 치료 설문조사",
+        t_sec1: "섹션 1: 소개 및 동의서",
+        t_proj_title_lbl: "프로젝트 제목",
+        t_proj_title: "병원 전 임종 자율성, 문화 및 윤리",
+        t_pi_lbl: "책임 연구자",
+        t_pi: piInformation,
+        t_desc_lbl: "연구 설명",
+        t_desc: "본 연구는 다양한 문화권의 구급대원들이 심폐소생술 중단(TOR) 및 DNACPR에 대해 어떻게 의사결정을 내리는지 비교합니다. 이 설문은 법적 프로토콜, 가족의 압력, 문화적 가치 사이의 갈등을 탐구합니다.",
+        t_conf_lbl: "기밀성 및 윤리",
+        t_conf_list: "<li>참여는 자발적이며 익명입니다.</li><li>개인 식별 정보(이름, IP 주소 등)는 보고되지 않습니다.</li><li>예상 소요 시간은 8-10분입니다.</li><li>데이터는 학술 목적으로만 사용됩니다.</li>",
+        t_irb_lbl: "임상시험심사위원회(IRB) 승인",
+        t_irb_text: "본 연구는 임상시험심사위원회(IRB)의 승인을 받았습니다 (승인 번호: ECKIRB1150308).",
+        t_elig_lbl: "참여 자격",
+        t_elig_text: "계속 진행함으로써, 귀하는 현재 인증된 EMS 제공자(EMT, 구급대원, 간호사, 의사 등)이며 병원 전 치료에 종사하고 있음을 확인합니다.",
+        t_consent_lbl: "동의",
+        t_consent_text: "본인은 위의 연구 안내문을 읽고 이해했습니다. 계속 진행함으로써 본 연구 참여에 자발적으로 동의합니다.",
+        btn_agree: "참여에 동의합니다",
+        btn_decline: "동의하지 않습니다",
+        msg_decline_title: "참여 거부",
+        msg_decline_text: "시간을 내주셔서 감사합니다. 본 연구에 참여하지 않기로 선택하셨습니다. 창을 닫으셔도 됩니다.",
+        msg_thanks_title: "감사합니다!",
+        msg_thanks_text: "응답이 성공적으로 기록되었습니다. 본 연구에 소중한 기여를 해주셔서 깊이 감사드립니다.",
+
+        t_sec2: "섹션 2: 인구통계학적 정보",
+        t_sec3: "섹션 3: 임상 시나리오",
+        t_sec3_inst: "각 시나리오를 주의 깊게 읽으십시오. 귀하가 현장의 주임 임상의라고 가정하십시오. 교과서가 말하는 것이 아닌, 실제 근무 환경에서 가장 취하기 쉬운 행동을 기반으로 답변하십시오.",
+        t_sec4: "섹션 4: 법적 자신감 척도",
+        t_sec5: "섹션 5: 수정된 PARPACT — 역량 및 태도",
+        t_sec5_desc: "파트 A: 자신감 수준을 평가하십시오 (1 = 매우 낮음; 5 = 매우 높음)",
+        t_sec6: "섹션 6: EMS 요원 도덕적 고뇌 척도 (MDS-EMS)",
+        t_sec6_desc: "병원 전 실무에서 다음 때문에 고통을 느낍니다… (1 = 전혀 없음; 5 = 매우 자주)",
+        t_sec7: "섹션 7: 자유 의견",
+        t_q7_1: "임종 치료와 관련하여 기억에 남는 특정 사례나 장벽이 있습니까?",
+        btn_submit: "제출하기",
+
+        lk_5: ["1<br>전혀 동의하지 않음", "2<br>동의하지 않음", "3<br>보통", "4<br>동의함", "5<br>매우 동의함"],
+        lk_conf: ["1<br>매우 낮음", "2", "3", "4", "5<br>매우 높음"],
+        lk_tf: ["예", "아니요", "모름"],
+        lk_mds: ["1<br>전혀 없음", "2<br>드물게", "3<br>가끔", "4<br>자주", "5<br>매우 자주"],
+
+        demo: [
+          { name: "country", q: "1. 진료 국가:", opts: ["대만", "한국", "일본", "사우디아라비아", "요르단", "영국", "미국", "호주", "캐나다", "기타"] },
+          { name: "cert_level", q: "2. 현재 자격 수준:", opts: ["EMT-Basic / EMT-1", "EMT-Intermediate / EMT-2 / AEMT", "Paramedic / EMT-P", "간호사 / 의사 (병원 전)", "기타"] },
+          { name: "experience", q: "3. EMS 경험 연수:", opts: ["1년 미만", "1–5년", "6–10년", "11–15년", "15년 이상"] },
+          { name: "education", q: "4. 최고 학력:", opts: ["고등학교 / 직업 훈련", "전문학사", "학사", "석사 이상"] },
+          { name: "pall_training", q: "5. 완화 의료에 대한 특별 교육을 받으셨습니까?", opts: ["아니요, 전혀 없음", "예, 초기 교육에서 간략히 언급됨 (< 4시간)", "예, 전문 계속 교육 과정 (> 4시간)"] },
+          { name: "religion", q: "6. 종교:", opts: ["없음 / 무신론 / 불가지론", "불교 / 도교", "이슬람교", "기독교 (개신교 / 가톨릭)", "기타"] }
+        ],
+
+        vignettes: [
+          {
+            title: "시나리오 1: 유효한 DNACPR 대 가족 갈등",
+            desc: "<b>상황:</b> 말기 폐암을 앓고 있는 78세 남성의 자택에 도착하니 환자가 심정지 상태입니다.<br><br><b>문서:</b> 유효한 DNACPR(심폐소생술 포기) 양식이 제시되고 확인되었습니다.<br><br><b>갈등:</b> 환자의 아들은 극도로 감정적인 상태로 울면서 공격적으로 요구합니다: <em>\"우리 아버지를 살려내! 지금 당장 CPR을 하지 않으면 고소할 거야!\"</em>",
+            q1: "Q1.1 즉각적인 조치는?",
+            opts1: ["즉시 완전한 CPR을 시작하고 이송한다.", "가족을 진정시키기 위해 \"슬로우 코드\"(상징적/비효율적 CPR)를 수행한 후 이송한다.", "CPR을 보류하고 DNACPR 지시를 따른다.", "먼저 협상하되, 가족이 계속 주장하면 CPR을 시작한다."],
+            q2: "Q1.2 이 상황에서 CPR을 거부해도 법적 보호를 받을 확신이 있다."
+          },
+          {
+            title: "시나리오 2: 문서 없음 대 '가게 놔두세요'",
+            desc: "<b>상황:</b> 중증 치매와 다발성 장기 부전을 앓고 있는 85세 여성이 침대에서 맥박이 없는 상태로 발견되었습니다. 그녀는 노쇠하고 병상에 누워 지냅니다.<br><br><b>문서:</b> 공식적인 종이 또는 디지털 DNACPR 기록이 발견되지 않습니다.<br><br><b>갈등:</b> 가족이 차분하게 당신에게 말합니다: <em>\"어머니는 충분히 고통받으셨습니다. 우리는 모두 어머니를 보내드리기로 합의했습니다. CPR로 어머니를 괴롭히지 말아 주세요.\"</em>",
+            q1: "Q2.1 즉각적인 조치는?",
+            opts1: ["서면 문서가 없으므로 즉시 CPR을 시작한다.", "가족의 구두 요청과 임상적 판단에 따라 CPR을 보류한다.", "온라인 의료 지도 / 의사에게 연락하여 중단 승인을 받는다."],
+            q2: "Q2.2 구두 요청만으로 CPR을 중단하면 법적 책임이 두렵다."
+          },
+          {
+            title: "시나리오 3: 시스템 압박과 대중의 시선",
+            desc: "<b>상황:</b> 공공장소에서 심정지가 발생합니다. 환자는 말기 환자처럼 보이며 유효한 DNACPR을 보유하고 있습니다.<br><br><b>압박:</b> 주변 사람들이 스마트폰으로 촬영하고 있습니다. 지휘 센터가 무전으로 연락합니다: <em>\"이에 대한 신고가 많이 들어오고 있습니다. 가족이 어렵습니다. 민원 / 언론 문제를 피하기 위해 그냥 이송하세요.\"</em>",
+            q1: "Q3.1 즉각적인 조치는?",
+            opts1: ["지시에 따라 CPR을 시작하고 이송한다.", "\"쇼 코드\"를 수행한다: 환자를 이송하면서 소생술 시늉을 낸다.", "입장을 고수한다: 압력에도 불구하고 유효한 DNACPR을 근거로 CPR을 거부한다."],
+            q2: "Q3.2 나의 조직은 윤리적으로 올바르지만 인기 없는 결정을 내릴 때 나를 지지해준다."
+          }
+        ],
+
+        legal: [
+          "1. 나는 내 관할 구역에서 DNACPR 지시의 법적 지위를 이해한다.",
+          "2. 나는 CPR을 보류할 수 있는 나의 권한을 이해한다.",
+          "3. DNACPR 지시를 준수하면 징계 조치를 받을까 봐 두렵다.",
+          "4. 불만 제기가 있을 경우 내 조직이 나를 지지해줄 것이다."
+        ],
+
+        parpact_conf: [
+          "1. 나쁜 소식 전달 / 사망 통보를 가족에게 하는 것에 자신이 있다.",
+          "2. 내 결정에 반대하는 화난 가족을 다루는 것에 자신이 있다.",
+          "3. 임종 전 호흡과 같은 임종 징후를 가족에게 설명하는 것에 자신이 있다.",
+          "4. 소생술이 의학적으로 무의미한 때를 결정하는 것에 자신이 있다.",
+          "5. 임종 환자 가족의 문화적 또는 종교적 필요를 다루는 것에 자신이 있다."
+        ],
+
+        mds: [
+          "1. 생존 가능성이 없다는 것을 알면서도 환자에게 CPR을 수행하도록 강요받는다.",
+          "2. 법적 결과를 방지하기 위해서만 CPR을 시작해야 한다(방어적 의료).",
+          "3. 의학적 지시에 반하더라도 가족의 요구를 따라야 한다.",
+          "4. 현장에 있는 사람들을 만족시키기 위해 슬로우 코드나 쇼 코드(기만적 소생술)를 수행한다.",
+          "5. 환자가 죽어가는 과정만 연장시키는 고통스러운 처치를 받는 것을 목격한다.",
+          "6. 소생술이 무의미하다는 것을 알아도 중단할 법적 권한이 없다.",
+          "7. 의사나 지휘관으로부터 비윤리적이라고 생각하는 행동을 수행하라는 명령을 받는다.",
+          "8. 프라이버시가 불가능한 불안전하거나 존엄성이 없는 환경(붐비는 공공장소 등)에서 CPR을 수행해야 한다.",
+          "9. 시간 압박이나 지휘 센터 요건으로 인해 가족에게 적절한 정서적 지원을 제공할 수 없다.",
+          "10. 내 조직이 환자의 존엄성보다 민원 회피를 우선시한다고 느낀다.",
+          "11. 집에서 죽을 수 있도록 허용되어야 했던 환자를 이송하도록 강요받는다.",
+          "12. 가족 갈등으로 인해 유효한 DNACPR 지시가 무시되는 것을 본다.",
+          "13. 호흡 곤란이나 초조함 같은 임종 증상을 관리하기 위한 훈련이 부족하다.",
+          "14. 슬퍼하는 가족과 소통할 때 무력감을 느낀다.",
+          "15. 윤리적 결정을 내리는 동안 주변 사람들에게 녹화되거나 촬영될까 봐 걱정된다.",
+          "16. 개인 가치관과 직업적 프로토콜 사이의 갈등을 느낀다.",
+          "17. 적절한 인계나 지원 없이 고인과 함께 가족을 혼자 남겨두어야 한다.",
+          "18. 환자의 존엄성을 무시하는 방식으로 행동하는 동료를 목격한다.",
+          "19. EMS 시스템이 '좋은 죽음 제공'을 성공의 척도로 인식하지 않는다고 느낀다.",
+          "20. 이러한 소생술 결정의 감정적 부담을 집으로 가져간다."
+        ]
+      },
+
+      // ── العربية ───────────────────────────────────────────────────────────
+      ar: {
+        t_main: "قرارات الرعاية في نهاية الحياة قبل المستشفى",
+        t_sec1: "القسم 1: المقدمة والموافقة المستنيرة",
+        t_proj_title_lbl: "عنوان المشروع",
+        t_proj_title: "الاستقلالية وثقافة وأخلاقيات نهاية الحياة في مرحلة ما قبل المستشفى",
+        t_pi_lbl: "الباحث الرئيسي",
+        t_pi: piInformation,
+        t_desc_lbl: "الوصف",
+        t_desc: "أنت مدعو للمشاركة في دراسة بحثية تقارن كيفية اتخاذ مقدمي الخدمات الطبية الطارئة من ثقافات مختلفة للقرارات المتعلقة بإنهاء الإنعاش (TOR) وأوامر DNACPR. تستكشف هذه الدراسة الاستطلاعية الصراع بين البروتوكولات القانونية وضغوط الأسرة والقيم الثقافية.",
+        t_conf_lbl: "السرية والأخلاقيات",
+        t_conf_list: "<li>المشاركة طوعية ومجهولة الهوية.</li><li>لن يتم الإبلاغ عن أي معلومات هوية شخصية (مثل الأسماء أو عناوين IP).</li><li>وقت الإكمال المتوقع 12–15 دقيقة.</li><li>ستستخدم البيانات حصرياً للتحليل الأكاديمي.</li>",
+        t_irb_lbl: "موافقة لجنة المراجعة المؤسسية (IRB)",
+        t_irb_text: "تمت الموافقة على هذه الدراسة من قبل لجنة المراجعة المؤسسية (رقم الموافقة: ECKIRB1150308).",
+        t_elig_lbl: "معايير الأهلية",
+        t_elig_text: "بالمتابعة، تؤكد أنك حالياً مزود خدمة EMS معتمد (مثل فني طوارئ طبية، أو مسعف، أو ممرض، أو ما يعادله من الأطباء) وأنك نشط في الرعاية قبل المستشفى.",
+        t_consent_lbl: "الموافقة",
+        t_consent_text: "لقد قرأت وفهمت معلومات الدراسة المقدمة أعلاه. بالمتابعة، أوافق طواعية على المشاركة في هذا البحث.",
+        btn_agree: "أوافق على المشاركة",
+        btn_decline: "لا أوافق",
+        msg_decline_title: "تم رفض الاستبيان",
+        msg_decline_text: "شكراً لوقتك. لقد اخترت عدم المشاركة في هذه الدراسة. يمكنك إغلاق هذه النافذة.",
+        msg_thanks_title: "شكراً لك!",
+        msg_thanks_text: "تم تسجيل ردك بنجاح. نحن نقدر مساهمتك القيمة في هذه الدراسة.",
+
+        t_sec2: "القسم 2: المعلومات الديموغرافية",
+        t_sec3: "القسم 3: السيناريوهات السريرية",
+        t_sec3_inst: "يرجى قراءة كل سيناريو بعناية. افترض أنك الطبيب الرئيسي في الموقع. أجب بناءً على واقع بيئة عملك — ما الذي ستفعله على الأرجح — وليس فقط ما تقوله الكتب المدرسية.",
+        t_sec4: "القسم 4: مقياس الثقة القانونية",
+        t_sec5: "القسم 5: PARPACT المعدّل — الكفاءة والمواقف",
+        t_sec5_desc: "الجزء أ: قيّم مستوى ثقتك (1 = منخفض جداً؛ 5 = مرتفع جداً)",
+        t_sec6: "القسم 6: مقياس الضيق الأخلاقي لموظفي خدمات الطوارئ الطبية",
+        t_sec6_desc: "في ممارستي قبل المستشفى، أشعر بالضيق بسبب… (1 = أبداً؛ 5 = دائماً)",
+        t_sec7: "القسم 7: تعليقات مفتوحة",
+        t_q7_1: "هل هناك حالة أو عائق محدد يتعلق برعاية نهاية الحياة لا يزال عالقاً في ذهنك؟",
+        btn_submit: "إرسال",
+
+        lk_5: ["1<br>لا أوافق بشدة", "2<br>لا أوافق", "3<br>محايد", "4<br>أوافق", "5<br>أوافق بشدة"],
+        lk_conf: ["1<br>منخفض جداً", "2", "3", "4", "5<br>مرتفع جداً"],
+        lk_tf: ["صح", "خطأ", "غير متأكد"],
+        lk_mds: ["1<br>أبداً", "2<br>نادراً", "3<br>أحياناً", "4<br>غالباً", "5<br>دائماً"],
+
+        demo: [
+          { name: "country", q: "1. بلد الممارسة:", opts: ["تايوان", "كوريا الجنوبية", "اليابان", "السعودية", "الأردن", "بريطانيا", "أمريكا", "أستراليا", "كندا", "أخرى"] },
+          { name: "cert_level", q: "2. مستوى الشهادة الحالي:", opts: ["EMT-Basic / EMT-1", "EMT-Intermediate / EMT-2 / AEMT", "Paramedic / EMT-P", "ممرض / طبيب (قبل المستشفى)", "أخرى"] },
+          { name: "experience", q: "3. سنوات الخبرة في EMS:", opts: ["أقل من سنة", "1–5 سنوات", "6–10 سنوات", "8-10 سنة", "أكثر من 15 سنة"] },
+          { name: "education", q: "4. أعلى مستوى تعليمي:", opts: ["ثانوي / تدريب مهني", "دبلوم", "بكالوريوس", "ماجستير فأعلى"] },
+          { name: "pall_training", q: "5. هل تلقيت تدريباً محدداً في الرعاية التلطيفية؟", opts: ["لا، أبداً", "نعم، إشارة مختصرة في التدريب الأولي (< 4 ساعات)", "نعم، دورة تعليم مستمر متخصصة (> 4 ساعات)"] },
+          { name: "religion", q: "6. الانتماء الديني:", opts: ["لا يوجد / إلحاد / لاأدرية", "بوذية / طاوية", "إسلام", "مسيحية (بروتستانتية / كاثوليكية)", "أخرى"] }
+        ],
+
+        vignettes: [
+          {
+            title: "السيناريو 1: DNACPR صالح مقابل تعارض الأسرة",
+            desc: "<b>المشهد:</b> تصل إلى منزل رجل يبلغ من العمر 78 عامًا مصاب بسرطان الرئة في مراحله الأخيرة ويعاني من سكتة قلبية.<br><br><b>الوثيقة:</b> تم تقديم وتأكيد نموذج DNACPR (عدم محاولة الإنعاش القلبي الرئوي) الصالح.<br><br><b>الصراع:</b> الابن عاطفي للغاية، يبكي، ويطالب بعدوانية: <em>«أنقذ والدي! قم بإجراء الإنعاش القلبي الرئوي الآن وإلا سأقاضيك!»</em>",
+            q1: "س1.1 ما هو إجراءك الفوري؟",
+            opts1: ["بدء الإنعاش الكامل فوراً والنقل.", "إجراء \"الكود البطيء\" (إنعاش رمزي/غير فعّال) لتهدئة الأسرة، ثم النقل.", "وقف الإنعاش واتباع أمر DNACPR.", "التفاوض أولاً، وإذا أصرت الأسرة، بدء الإنعاش."],
+            q2: "س1.2 أنا واثق من أن نظامي القانوني سيحميني إذا رفضت بدء الإنعاش في هذا الموقف."
+          },
+          {
+            title: "السيناريو 2: لا توجد وثيقة مقابل «دعه يرحل»",
+            desc: "<b>المشهد:</b> تم العثور على امرأة تبلغ من العمر 85 عامًا تعاني من خرف شديد وفشل في أعضاء متعددة بلا نبض في سريرها. إنها ضعيفة وطريحة الفراش.<br><br><b>الوثيقة:</b> لم يتم العثور على أي سجل رسمي ورقي أو رقمي لـ DNACPR في الموقع.<br><br><b>الصراع:</b> تخبرك العائلة بهدوء: <em>«لقد عانت بما فيه الكفاية. لقد اتفقنا جميعًا على تركها ترحل. من فضلك لا تعذبها بالإنعاش القلبي الرئوي.»</em>",
+            q1: "س2.1 ما هو إجراءك الفوري؟",
+            opts1: ["بدء الإنعاش فوراً لعدم وجود وثائق ورقية.", "وقف الإنعاش بناءً على طلب الأسرة الشفهي والحكم السريري.", "الاتصال بالتوجيه الطبي عبر الإنترنت / الطبيب للحصول على إذن بالتوقف."],
+            q2: "س2.2 أخشى المسؤولية القانونية إذا أوقفت الإنعاش بناءً على طلب شفهي فقط."
+          },
+          {
+            title: "السيناريو 3: ضغط النظام والتدقيق العام",
+            desc: "<b>المشهد:</b> يحدث توقف قلبي في مكان عام. يبدو أن المريض في مرحلة نهائية ولديه DNACPR صالح.<br><br><b>الضغط:</b> المارة يصورونك بالهواتف الذكية. يتصل مركز الإرسال لاسلكياً: <em>«نتلقى مكالمات بشأن هذا الأمر. الأسرة صعبة. فقط انقل المريض لتجنب الشكاوى / المشكلات الإعلامية.»</em>",
+            q1: "س3.1 ما هو إجراءك الفوري؟",
+            opts1: ["اتباع أوامر الإرسال: بدء الإنعاش والنقل لتجنب المشاكل.", "تنفيذ \"كود العرض\": التظاهر بالإنعاش أثناء نقل المريض.", "التمسك بموقفك: رفض بدء الإنعاش، مستشهداً بـ DNACPR الصالح رغم الضغط."],
+            q2: "س3.2 تدعمني مؤسستي عندما أتخذ قرارات صحيحة أخلاقياً لكنها غير شعبية."
+          }
+        ],
+
+        legal: [
+          "1. أفهم الوضع القانوني لأوامر DNACPR في نطاق سلطتي القضائية.",
+          "2. أفهم صلاحيتي في حجب الإنعاش القلبي الرئوي.",
+          "3. أخشى الإجراءات التأديبية إذا التزمت بأمر DNACPR.",
+          "4. ستدعمني مؤسستي إذا قُدِّمت شكوى."
+        ],
+
+        parpact_conf: [
+          "1. أشعر بالثقة في تبليغ الأسرة بأخبار سيئة / إخطار الوفاة.",
+          "2. أشعر بالثقة في التعامل مع أحد أفراد الأسرة الغاضبين الذين يعارضون قراري.",
+          "3. أشعر بالثقة في شرح علامات الاحتضار، مثل التنفس الشرقي، للأسرة.",
+          "4. أشعر بالثقة في تحديد متى يكون الإنعاش غير مجدٍ طبياً.",
+          "5. أشعر بالثقة في التعامل مع الاحتياجات الثقافية أو الدينية لأسرة المريض المحتضر."
+        ],
+
+        mds: [
+          "1. أُجبر على إجراء الإنعاش القلبي الرئوي لمريض أعلم أنه لا أمل في إنقاذه.",
+          "2. يجب عليّ بدء الإنعاش فقط لتجنب العواقب القانونية (الطب الدفاعي).",
+          "3. يجب عليّ اتباع مطالب الأسرة حتى عندما تكون مخالفة للمؤشرات الطبية.",
+          "4. أقوم بإجراء أكواد بطيئة أو أكواد عرض (إنعاش خادع) لإرضاء الحاضرين.",
+          "5. أشهد المرضى يتلقون تدخلات مؤلمة لا تزيد إلا من إطالة فترة احتضارهم.",
+          "6. أفتقر إلى السلطة القانونية لإيقاف الإنعاش حتى عندما أعلم أنه غير مجدٍ.",
+          "7. يأمرني طبيب أو مرسل بتنفيذ أفعال أعتقد أنها غير أخلاقية.",
+          "8. يجب عليّ إجراء الإنعاش في بيئات غير آمنة أو مهينة (كالأماكن العامة المزدحمة) حيث الخصوصية مستحيلة.",
+          "9. لا أستطيع تقديم الدعم العاطفي الكافي للأسرة بسبب ضغط الوقت أو متطلبات مركز الإرسال.",
+          "10. أشعر أن مؤسستي تعطي الأولوية لتجنب الشكاوى على كرامة المريض.",
+          "11. أُجبر على نقل مريض كان يجب السماح له بالوفاة في منزله.",
+          "12. أرى أوامر DNACPR الصالحة يتم تجاهلها بسبب تعارض الأسرة.",
+          "13. أفتقر إلى التدريب الكافي لإدارة أعراض نهاية الحياة، مثل ضيق التنفس أو الإثارة.",
+          "14. أشعر بالعجز عند التواصل مع الأسر الحزينة.",
+          "15. أشعر بالقلق من تسجيلي أو تصويري من قبل المارة أثناء اتخاذ قرارات أخلاقية.",
+          "16. أشعر بالتعارض بين قيمي الشخصية والبروتوكولات المهنية.",
+          "17. يجب عليّ ترك الأسرة وحيدة مع المتوفى دون تسليم مناسب أو دعم.",
+          "18. أراقب الزملاء يتصرفون بطرق تتجاهل كرامة المريض.",
+          "19. أشعر أن نظام EMS لا يعترف بتوفير ميتة كريمة كمقياس للنجاح.",
+          "20. أحمل العبء العاطفي لقرارات الإنعاش هذه معي إلى المنزل."
+        ]
+      }
+    };
+
+    // ─── STATE ─────────────────────────────────────────────────────────────
+    let currentLang = 'en';
+
+    // ─── RENDER ────────────────────────────────────────────────────────────
+    function renderSurvey() {
+      const d = translations[currentLang];
+
+      // Intro Screen
+      document.getElementById('t_main').innerText          = d.t_main;
+      document.getElementById('t_sec1').innerText          = d.t_sec1;
+      document.getElementById('t_proj_title_lbl').innerText = d.t_proj_title_lbl;
+      document.getElementById('t_proj_title').innerText    = d.t_proj_title;
+      document.getElementById('t_pi_lbl').innerText        = d.t_pi_lbl;
+      document.getElementById('t_pi').innerText            = d.t_pi;
+      document.getElementById('t_desc_lbl').innerText      = d.t_desc_lbl;
+      document.getElementById('t_desc').innerText          = d.t_desc;
+      document.getElementById('t_conf_lbl').innerText      = d.t_conf_lbl;
+      document.getElementById('t_conf_list').innerHTML     = d.t_conf_list;
+      document.getElementById('t_irb_lbl').innerText       = d.t_irb_lbl;
+      document.getElementById('t_irb_text').innerText      = d.t_irb_text;
+      document.getElementById('t_elig_lbl').innerText      = d.t_elig_lbl;
+      document.getElementById('t_elig_text').innerText     = d.t_elig_text;
+      document.getElementById('t_consent_lbl').innerText   = d.t_consent_lbl;
+      document.getElementById('t_consent_text').innerText  = d.t_consent_text;
+      document.getElementById('btn_agree').innerText       = d.btn_agree;
+      document.getElementById('btn_decline').innerText     = d.btn_decline;
+      document.getElementById('msg_decline_title').innerText = d.msg_decline_title;
+      document.getElementById('msg_decline_text').innerText  = d.msg_decline_text;
+      document.getElementById('msg_thanks_title').innerText  = d.msg_thanks_title;
+      document.getElementById('msg_thanks_text').innerText   = d.msg_thanks_text;
+
+      // Survey Section Headers
+      document.getElementById('t_sec2').innerText    = d.t_sec2;
+      document.getElementById('t_sec3').innerText    = d.t_sec3;
+      document.getElementById('t_sec4').innerText    = d.t_sec4;
+      document.getElementById('t_sec5').innerText    = d.t_sec5;
+      document.getElementById('t_sec5_desc').innerText = d.t_sec5_desc;
+      document.getElementById('t_sec6').innerText    = d.t_sec6;
+      document.getElementById('t_sec6_desc').innerText = d.t_sec6_desc;
+      document.getElementById('t_sec7').innerText    = d.t_sec7;
+      document.getElementById('t_q7_1').innerText    = d.t_q7_1;
+      document.getElementById('btn_submit').innerText = d.btn_submit;
+
+      // ── Section 2: Demographics ─────────────────────────────────────────
+      let htmlDemo = '';
+      d.demo.forEach((item, i) => {
+        htmlDemo += `<div class="question-block"><label class="q-title">${item.q}</label>`;
+        if (i === 0) {
+          htmlDemo += `<select name="country" required><option value="">--</option>`;
+          item.opts.forEach(opt => htmlDemo += `<option value="${opt}">${opt}</option>`);
+          htmlDemo += `</select>`;
+        } else {
+          htmlDemo += `<div class="radio-group">`;
+          item.opts.forEach((opt, j) => {
+            htmlDemo += `<label><input type="radio" name="${item.name}" value="${j+1}" required> ${opt}</label>`;
+          });
+          htmlDemo += `</div>`;
+        }
+        htmlDemo += `</div>`;
+      });
+      document.getElementById('demo_container').innerHTML = htmlDemo;
+
+      // ── Section 3: Clinical Vignettes ───────────────────────────────────
+      let htmlVig = `<p style="font-size:14px; font-style:italic; color:#555;">${d.t_sec3_inst}</p>`;
+      d.vignettes.forEach((v, i) => {
+        const qNum = i + 1;
+        htmlVig += `<div class="question-block">
+          <h3 style="margin-top:0;">${v.title}</h3>
+          <div class="vignette-box">${v.desc}</div>
+          <label class="q-title">${v.q1}</label>
+          <div class="radio-group">`;
+        v.opts1.forEach((opt, j) => {
+          htmlVig += `<label><input type="radio" name="q${qNum}_1" value="${j+1}" required> ${opt}</label>`;
+        });
+        htmlVig += `</div><label class="q-title" style="margin-top:20px;">${v.q2}</label>`;
+        if (v.opts2) {
+          htmlVig += `<div class="radio-group">`;
+          v.opts2.forEach((opt, j) => {
+            htmlVig += `<label><input type="radio" name="q${qNum}_2" value="${j+1}" required> ${opt}</label>`;
+          });
+          htmlVig += `</div>`;
+        } else {
+          htmlVig += `<div class="likert">`;
+          d.lk_5.forEach((lk, j) => {
+            htmlVig += `<label><input type="radio" name="q${qNum}_2" value="${j+1}" required><br>${lk}</label>`;
+          });
+          htmlVig += `</div>`;
+        }
+        htmlVig += `</div>`;
+      });
+      document.getElementById('vignette_container').innerHTML = htmlVig;
+
+      // ── Section 4: Legal Confidence Scale (p1–p4) ──────────────────────
+      let htmlLegal = '';
+      d.legal.forEach((q, i) => {
+        htmlLegal += `<div class="question-block" style="padding-bottom:10px;">
+          <label class="q-title">${q}</label>
+          <div class="likert">`;
+        d.lk_5.forEach((lk, j) => {
+          htmlLegal += `<label><input type="radio" name="p${i+1}" value="${j+1}" required><br>${lk}</label>`;
+        });
+        htmlLegal += `</div></div>`;
+      });
+      document.getElementById('legal_container').innerHTML = htmlLegal;
+
+      // ── Section 5: Modified PARPACT Part A — Confidence (p5–p9) ────────
+      let htmlPar = '';
+      d.parpact_conf.forEach((q, i) => {
+        htmlPar += `<div class="question-block" style="padding-bottom:10px;">
+          <label class="q-title">${q}</label>
+          <div class="likert">`;
+        d.lk_conf.forEach((lk, j) => {
+          htmlPar += `<label><input type="radio" name="p${i+5}" value="${j+1}" required><br>${lk}</label>`;
+        });
+        htmlPar += `</div></div>`;
+      });
+      document.getElementById('parpact_container').innerHTML = htmlPar;
+
+      // ── Section 6: MDS-EMS (m1–m20) ────────────────────────────────────
+      let htmlMds = '';
+      d.mds.forEach((q, i) => {
+        htmlMds += `<div class="question-block" style="padding-bottom:10px;">
+          <label class="q-title">${q}</label>
+          <div class="likert">`;
+        d.lk_mds.forEach((lk, j) => {
+          htmlMds += `<label><input type="radio" name="m${i+1}" value="${j+1}" required><br>${lk}</label>`;
+        });
+        htmlMds += `</div></div>`;
+      });
+      document.getElementById('mds_container').innerHTML = htmlMds;
+    }
+
+    // ─── LANGUAGE SELECTION (chosen once, up front) ────────────────────────
+    function selectLanguage(lang) {
+      currentLang = lang;
+      document.body.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+      document.getElementById('langScreen').style.display = 'none';
+      document.getElementById('mainContainer').style.display = 'block';
+      renderSurvey();
+      window.scrollTo(0, 0);
+    }
+
+    // ─── NAVIGATION ────────────────────────────────────────────────────────
+    function startSurvey() {
+      document.getElementById('introScreen').style.display  = 'none';
+      document.getElementById('surveyMain').style.display   = 'block';
+      window.scrollTo(0, 0);
+    }
+
+    function declineSurvey() {
+      document.getElementById('introScreen').style.display  = 'none';
+      document.getElementById('declineScreen').style.display = 'block';
+      document.getElementById('headerBar').style.display    = 'none';
+      window.scrollTo(0, 0);
+    }
+
+    // ─── SUBMIT (改用 fetch 呼叫 GAS Web App，取代 google.script.run) ──────
+    function submitForm() {
+      const form = document.getElementById('surveyForm');
+      if (!form.checkValidity()) { form.reportValidity(); return; }
+
+      const btn = document.getElementById('btn_submit');
+      btn.innerText = "Submitting…";
+      btn.disabled  = true;
+
+      const formData = {};
+      new FormData(form).forEach((val, key) => formData[key] = val);
+      formData.language = currentLang;
+
+      fetch(GAS_WEB_APP_URL, {
+        method: 'POST',
+        // text/plain 避免觸發 CORS preflight；GAS 端仍可用 JSON.parse 正常解析
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(formData)
+      })
+        .then(res => res.json())
+        .then(res => {
+          if (res.success) {
+            document.getElementById('surveyMain').style.display    = 'none';
+            document.getElementById('headerBar').style.display     = 'none';
+            document.getElementById('thankYouScreen').style.display = 'block';
+            window.scrollTo(0, 0);
+          } else {
+            alert("Error: " + res.message);
+            btn.innerText = translations[currentLang].btn_submit;
+            btn.disabled  = false;
+          }
+        })
+        .catch(err => {
+          alert("Submission failed. Please try again.\n" + err.message);
+          btn.innerText = translations[currentLang].btn_submit;
+          btn.disabled  = false;
+        });
+    }
+  </script>
+</body>
+</html>
