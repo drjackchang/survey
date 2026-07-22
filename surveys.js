@@ -5,7 +5,7 @@ const SURVEYS = [
     titleEn: 'EMS Clinical Preceptor Impact Survey',
     desc: '探討臨床指導員對救護人員養成之關鍵影響 · IRB: ECKIRB1150307',
     descEn: 'Key impacts of preceptors on paramedic development',
-    url: 'https://drjackchang.github.io/survey/Preceptor.html',
+    url: 'https://drjackchang.github.io/survey/preceptor.html',
     start: '2026/05/26',
     end: '2026/12/31',
     icon: 'ti-stethoscope',
