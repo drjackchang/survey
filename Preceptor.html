@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EMS Preceptor Survey</title>
+<style>
+  :root {
+    --primary: #2563a8;
+    --primary-light: #dbeafe;
+    --accent: #1d4ed8;
+    --success: #16a34a;
+    --danger: #dc2626;
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --border: #e2e8f0;
+    --text: #1e293b;
+    --muted: #64748b;
+    --radius: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', 'PingFang TC', 'Noto Sans TC', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 24px 16px 60px;
+  }
+
+  /* Header */
+  .survey-header {
+    background: var(--primary);
+    color: white;
+    padding: 20px 24px;
+    border-radius: var(--radius);
+    margin-bottom: 24px;
+    text-align: center;
+  }
+  .survey-header h1 { font-size: 1.2rem; line-height: 1.5; }
+  .survey-header p { font-size: 0.85rem; opacity: 0.85; margin-top: 4px; }
+
+  /* Progress */
+  .progress-bar {
+    background: var(--border);
+    border-radius: 99px;
+    height: 8px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    background: var(--primary);
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.4s ease;
+  }
+  .progress-label {
+    text-align: right;
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+
+  .section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 4px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--primary-light);
+  }
+  .section-sub {
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-bottom: 16px;
+    margin-top: 4px;
+  }
+
+  /* Question block */
+  .question-block {
+    margin-bottom: 22px;
+  }
+  .question-block:last-child { margin-bottom: 0; }
+
+  .q-label {
+    font-size: 0.92rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    line-height: 1.5;
+  }
+  .q-num {
+    color: var(--primary);
+    font-weight: 700;
+    margin-right: 4px;
+  }
+  .q-note {
+    font-size: 0.78rem;
+    color: var(--danger);
+    font-weight: 400;
+  }
+
+  /* Radio / Checkbox options */
+  .options { display: flex; flex-direction: column; gap: 8px; }
+  .option-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    font-size: 0.88rem;
+    line-height: 1.4;
+  }
+  .option-label:hover { background: var(--primary-light); border-color: var(--primary); }
+  .option-label input { margin-top: 2px; flex-shrink: 0; accent-color: var(--primary); }
+  .option-label.selected { background: var(--primary-light); border-color: var(--primary); }
+
+  /* Likert scale */
+  .likert-wrap {
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+  .likert-table {
+    width: 100%;
+    min-width: 420px;
+    border-collapse: collapse;
+  }
+  .likert-table th {
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-align: center;
+    padding: 4px 2px 8px;
+    font-weight: 600;
+  }
+  .likert-row td {
+    text-align: center;
+    padding: 6px 2px;
+    border-top: 1px solid var(--border);
+  }
+  .likert-row:hover td { background: var(--primary-light); }
+  .likert-row td:first-child {
+    text-align: left;
+    padding-left: 4px;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    min-width: 200px;
+  }
+  .likert-row td input[type=radio] { accent-color: var(--primary); width: 18px; height: 18px; cursor: pointer; }
+
+  /* Number input */
+  input[type=number], input[type=text] {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    width: 120px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  input[type=number]:focus, input[type=text]:focus { border-color: var(--primary); }
+
+  /* Buttons */
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+    margin-top: 24px;
+  }
+  .btn {
+    padding: 12px 28px;
+    border-radius: 8px;
+    border: none;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn-primary { background: var(--primary); color: white; }
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-secondary { background: var(--border); color: var(--text); }
+  .btn-secondary:hover { opacity: 0.8; }
+  .btn-success { background: var(--success); color: white; font-size: 1rem; padding: 14px 36px; }
+
+  /* Language selector */
+  .lang-card {
+    max-width: 480px;
+    margin: 80px auto 0;
+    text-align: center;
+  }
+  .lang-card h2 { font-size: 1.3rem; margin-bottom: 8px; }
+  .lang-card p { color: var(--muted); font-size: 0.9rem; margin-bottom: 28px; }
+  .lang-btns { display: flex; gap: 16px; justify-content: center; }
+  .lang-btn {
+    padding: 16px 36px;
+    border-radius: 10px;
+    border: 2px solid var(--primary);
+    background: white;
+    color: var(--primary);
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .lang-btn:hover { background: var(--primary); color: white; }
+
+  /* Consent */
+  .consent-box {
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    border-radius: 8px;
+    padding: 16px;
+    font-size: 0.88rem;
+    line-height: 1.8;
+    margin-bottom: 16px;
+  }
+  .consent-box h3 { margin-bottom: 8px; color: var(--primary); }
+
+  /* Thank you */
+  .thankyou {
+    text-align: center;
+    padding: 60px 20px;
+  }
+  .thankyou .icon { font-size: 3rem; margin-bottom: 16px; }
+  .thankyou h2 { font-size: 1.5rem; color: var(--success); margin-bottom: 12px; }
+  .thankyou p { color: var(--muted); font-size: 0.95rem; line-height: 1.7; }
+
+  /* Validation */
+  .error-msg { color: var(--danger); font-size: 0.8rem; margin-top: 6px; display: none; }
+  .has-error .error-msg { display: block; }
+  .has-error .option-label { border-color: var(--danger); }
+  .has-error input[type=number] { border-color: var(--danger); }
+
+  /* IRB badge */
+  .irb-badge {
+    display: inline-block;
+    background: #f0fdf4;
+    border: 1px solid #86efac;
+    color: #15803d;
+    font-size: 0.75rem;
+    padding: 3px 10px;
+    border-radius: 99px;
+    margin-top: 8px;
+  }
+
+  @media (max-width: 600px) {
+    .card { padding: 16px; }
+    .btn { padding: 10px 18px; font-size: 0.88rem; }
+  }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Survey Header (shown after lang select) -->
+  <div id="survey-header" class="survey-header hidden">
+    <h1 id="header-title"></h1>
+    <p id="header-sub"></p>
+    <span class="irb-badge">IRB: ECKIRB1150307</span>
+  </div>
+
+  <!-- Progress -->
+  <div id="progress-wrap" class="hidden">
+    <div class="progress-label"><span id="progress-text"></span></div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  </div>
+
+  <div id="app"></div>
+</div>
+
+<script>
+// ============================================================
+// CONFIG — 貼上你部署後拿到的 GAS Web App 網址
+// 部署方式: GAS 專案 → 部署 → 新增部署作業 → 類型:網頁應用程式
+//           執行身分:我 / 誰可以存取:任何人
+// ============================================================
+const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx8WdCYc_q2b1w0zs3UabnmYNLQd6Pc-sLlGrscRnt1iIWsvI2lodXS-uARhCqgaTMPrg/exec';
+
+// ============================================================
+// STATE
+// ============================================================
+let lang = 'zh';
+let page = 0;
+let answers = {};
+
+// ============================================================
+// I18N
+// ============================================================
+const T = {
+  zh: {
+    headerTitle: '救護實習臨床指導員影響力調查',
+    headerSub: '從技術傳承到臨床推理—探討臨床指導員對救護人員養成之關鍵影響',
+    langPrompt: '請選擇語言 / Please select language',
+    langSub: '選擇後將全程以該語言顯示',
+    btnZh: '繁體中文',
+    btnEn: 'English',
+    progress: '第 {cur} 頁，共 {total} 頁',
+    next: '下一頁 →',
+    back: '← 上一頁',
+    submit: '送出問卷',
+    required: '此題為必填',
+    requiredAge: '請輸入年齡（數字）',
+    // Consent
+    consentTitle: '研究參與說明與知情同意',
+    consentBody: `<p>我們是來自<strong>國立臺北護理健康大學</strong>的研究團隊。本研究旨在探討「臨床指導員 (Preceptor)」的教學行為如何影響學員的自信心、臨床推理能力及留任意願。您的真實心聲，將作為未來推動指導員制度改革與津貼政策的重要依據。</p>
+    <ul style="margin:10px 0 0 16px;line-height:2">
+      <li><strong>填答對象：</strong>正在實習的學員、或已結訓的現役救護人員。</li>
+      <li><strong>匿名聲明：</strong>本問卷採完全匿名，所有數據僅用於學術統計分析。</li>
+      <li><strong>所需時間：</strong>約 10–15 分鐘。</li>
+      <li><strong>IRB 核准：</strong>ECKIRB1150307</li>
+    </ul>
+    <p style="margin-top:10px">若您已閱讀上述說明並同意參與，請點擊「下一頁」開始填答。</p>`,
+    // Part 1
+    p1Title: '第一部分：個人背景',
+    q11: '您的性別',
+    q11o: ['生理男', '生理女'],
+    q12: '您的年紀（歲）',
+    q13: '您目前執業（或受訓）狀態',
+    q13o: [
+      '救護系大一、大二學生',
+      '救護系大三學生',
+      'Registered Paramedic',
+      'EMT-2 受訓中學員',
+      'EMT-P 受訓中學員',
+      'EMT-2 資格',
+      'EMT-P 資格',
+    ],
+    q14: '您在哪一個國家進行救護實習？',
+    q14o: ['澳洲', '台灣', '其他國家'],
+    q15: '您在本次救護實習前是否有執行救護的經驗？',
+    q15o: ['從未有過', '有'],
+    q16: '本次救護實習的時間長度？',
+    q16o: ['< 100 小時', '100–200 小時', '201–500 小時', '501–1000 小時', '> 1000 小時'],
+    q17: '整體而言，目前救護實習的單位救護量多寡？',
+    q17o: ['非常低', '低', '中等', '高', '非常高'],
+    q18: '目前救護實習指導員的安排模式為何？',
+    q18o: [
+      '每個分隊實習時固定一位指導員',
+      '每個分隊實習時固定 2–3 位指導員',
+      '每個分隊實習時每個救護班都不同指導員',
+    ],
+    q19: '您的救護實習指導員是否有接受過正式的教學培訓或有指導員證照？',
+    q19o: ['是', '否', '不知道'],
+    q110: '上次初訓的救護實習距今多久了？',
+    q110o: ['1 年以內', '1–3 年', '3–5 年', '超過 5 年'],
+    q111: '您目前仍在執行救護工作嗎？',
+    q111o: ['是的，仍是第一線救護人員（含救護義消）', '是的，在醫院內臨床單位', '否，已經離開救護或醫療'],
+    // Part 2
+    p2Title: '第二部分：核心指導員行為量表',
+    p2Inst: '請回想該次實習中，與您共勤時間最長或對您影響最深的那位「主要指導員」。請評估他在帶領您時，展現下列行為的頻率。',
+    p2Scale: '1 = 從未發生　　4 = 普通/偶爾　　7 = 總是如此',
+    dimA: 'A：關係與支持 Relationship & Support',
+    dimB: 'B：心理安全感 Psychological Safety',
+    dimC: 'C：身教與連結 Role Modeling',
+    dimD: 'D：回饋品質 Feedback Quality',
+    dimE: 'E：一致性與穩定性 Consistency & Stability',
+    q2items: [
+      { id:'Q2-1', dim:'A', text:'他/她讓我感到受歡迎，並將我視為團隊的一份子。' },
+      { id:'Q2-2', dim:'A', text:'當我遇到挫折或壓力時，他/她會給予情緒上的支持與鼓勵。' },
+      { id:'Q2-3', dim:'A', text:'他/她會主動確認我的狀態與適應程度。' },
+      { id:'Q2-4', dim:'B', text:'如果我不確定如何操作，我敢直接詢問他/她，而不會感到恐懼。' },
+      { id:'Q2-5', dim:'B', text:'若我犯了錯，他/她會將其視為「學習機會」而非僅是「責備」。' },
+      { id:'Q2-6', dim:'B', text:'在他/她面前我可以坦然地承認自己救護知識不足且不會感到羞愧。' },
+      { id:'Q2-7', dim:'B', reverse:true, text:'★ 在實習過程中，他/她的態度讓我覺得自己是一個累贅與負擔。（反向題）' },
+      { id:'Q2-8', dim:'C', text:'他/她所表現出來的專業素養讓我想要向他/她看齊。' },
+      { id:'Q2-9', dim:'C', text:'面對危急或混亂場面時，他/她展現的冷靜態度讓我印象深刻。' },
+      { id:'Q2-10', dim:'C', text:'他/她表現出高標準的臨床專業技術能力。' },
+      { id:'Q2-11', dim:'D', text:'他/她會給我「具體」的表現回饋，明確指出我哪裡做得好、哪裡需要改進。' },
+      { id:'Q2-12', dim:'D', text:'隨著實習進展，他/她會持續告知我是否有在進步。' },
+      { id:'Q2-13', dim:'D', text:'案件結束後，他/她會跟我討論剛剛的處置過程。' },
+      { id:'Q2-14', dim:'E', text:'無論案件多寡或日夜時段，他/她都能維持一致的教學態度。' },
+      { id:'Q2-15', dim:'E', text:'隨著我的經驗累積，他/她有觀察到我的進步，並給予我更多的信任。' },
+      { id:'Q2-16', dim:'E', text:'當現場做法與教科書不同時，他/她會解釋其中的差異原因，幫助我連結學校所學。' },
+    ],
+    likertLabels7: ['1\n從未', '2', '3', '4\n普通', '5', '6', '7\n總是'],
+    likertLabels7agree: ['1\n非常不同意', '2', '3', '4\n中立', '5', '6', '7\n非常同意'],
+    // Part 3-1
+    p31Title: '第三部分：初階學習者相關題目',
+    p31Inst: '請評估您的主要指導員展現下列行為的頻率。',
+    p31Scale: '1 = 從未　2 = 極少　3 = 偶爾　4 = 有時　5 = 經常　6 = 通常　7 = 總是',
+    q3a: [
+      { id:'Q3-1', text:'他/她給我的指令非常明確，讓我知道每一個步驟該做什麼。' },
+      { id:'Q3-2', text:'在要求我操作之前，他/她會先完整、標準地示範一次給我看。' },
+      { id:'Q3-3', text:'他/她讓我覺得有他在旁邊看著（當我的安全網），因此操作時感到很安全。' },
+      { id:'Q3-4', text:'當遇到場面失控或民眾情緒激動時，他/她會挺身而出保護我，避免我直接面對。' },
+      { id:'Q3-5', text:'他/她會先讓我做簡單的部分，等我熟練後再循序漸進讓我操作複雜的處置。' },
+    ],
+    // Part 3-2
+    p32Title: '第三部分：進階學習者相關題目',
+    p32Inst: '請評估您的主要指導員展現下列行為的頻率。',
+    p32Scale: '1 = 從未　2 = 極少　3 = 偶爾　4 = 有時　5 = 經常　6 = 通常　7 = 總是',
+    q3b: [
+      { id:'Q3-6', text:'他/她常問我「為什麼做這個決定？」，引導我思考背後的病理機轉與臨床推理。' },
+      { id:'Q3-7', text:'案件結束後，他/她會先詢問我的看法，再引導我反思剛剛處置過程的優缺點。' },
+      { id:'Q3-8', text:'在適當的情況下，他/她願意放手讓我擔任現場指揮（Team Leader）的角色。' },
+      { id:'Q3-9', text:'當我提出的處置計畫合理時，他/她會支持我去執行，即使那並非他原本的首選做法。' },
+      { id:'Q3-10', text:'他/她會指導我如何與溝通困難的病患或家屬應對，而不僅是教導醫療技術。' },
+      { id:'Q3-11', text:'他/她將我視為「未來的同事」來對待，並尊重我的專業意見。' },
+      { id:'Q3-12', text:'他/她會分享自己如何調適工作壓力，或面對創傷案件後的情緒影響之具體方法。' },
+    ],
+    // Part 4-1
+    p41Title: '第四部分：短期成效',
+    p41Scale: '1 = 非常不同意　4 = 中立　7 = 非常同意',
+    q4a: [
+      { id:'Q4-1', text:'經過這段救護實習，我有信心能通過結訓測驗並勝任救護工作。' },
+      { id:'Q4-2', text:'想到未來要獨立出勤跑救護，我感到非常有信心。' },
+      { id:'Q4-3', text:'整體而言，我對這段救護實習經驗感到非常滿意。' },
+    ],
+    // Part 4-2
+    p42Title: '第四部分：長期影響',
+    p42Scale: '1 = 非常不同意　4 = 中立　7 = 非常同意',
+    q4b: [
+      { id:'Q4-4', text:'在目前的實務工作中，我發現那位指導員教導的觀念或技巧是非常實用的。' },
+      { id:'Q4-5', text:'在危急情況下，我腦中常會浮現那位指導員的提醒，這幫助我避免犯錯。' },
+      { id:'Q4-6', text:'那位指導員的引導與鼓勵，是我決定「繼續留在」救護領域的關鍵原因。' },
+      { id:'Q4-7', text:'我現在帶學弟妹（或未來帶人）的方式，很大程度上是模仿當時那位指導員。' },
+      { id:'Q4-8', text:'如果當時能遇到更好的指導員，我現在的臨床能力可能會更強。' },
+    ],
+    thankyouTitle: '感謝您的參與！',
+    thankyouBody: '您的回答已成功送出。您寶貴的意見將成為推動救護實習制度改革的重要依據。<br><br>感謝您撥冗填寫本問卷，祝一切順心。',
+    submitting: '送出中...',
+    submitError: '送出失敗，請稍後再試。',
+  },
+
+  en: {
+    headerTitle: 'EMS Clinical Preceptor Impact Survey',
+    headerSub: 'From Technical Skill Transfer to Clinical Reasoning — Key Impacts of Preceptors on Paramedic Development',
+    langPrompt: '請選擇語言 / Please select language',
+    langSub: 'You will use this language throughout the survey',
+    btnZh: '繁體中文',
+    btnEn: 'English',
+    progress: 'Page {cur} of {total}',
+    next: 'Next →',
+    back: '← Back',
+    submit: 'Submit Survey',
+    required: 'This field is required',
+    requiredAge: 'Please enter your age (number)',
+    consentTitle: 'Participant Information & Informed Consent',
+    consentBody: `<p>We are a research team from <strong>National Taipei University of Nursing and Health Sciences</strong>. This study aims to explore how the teaching behaviors of Clinical Preceptors influence trainees' confidence, clinical reasoning, and intention to stay in the profession.</p>
+    <ul style="margin:10px 0 0 16px;line-height:2">
+      <li><strong>Participants:</strong> Students currently on clinical placement, or qualified EMS providers who have completed training.</li>
+      <li><strong>Anonymity:</strong> This survey is completely anonymous. All data will be used for academic statistical analysis only.</li>
+      <li><strong>Time required:</strong> Approximately 10–15 minutes.</li>
+      <li><strong>IRB Approval:</strong> ECKIRB1150307</li>
+    </ul>
+    <p style="margin-top:10px">If you have read the above and agree to participate, please click "Next" to begin.</p>`,
+    p1Title: 'Part 1: Personal Background',
+    q11: 'Your biological sex',
+    q11o: ['Male', 'Female'],
+    q12: 'Your age (years)',
+    q13: 'Your current status (training or practicing)',
+    q13o: [
+      'Year 1–2 Paramedicine student',
+      'Year 3 Paramedicine student',
+      'Registered Paramedic',
+      'EMT-2 trainee',
+      'EMT-P trainee',
+      'Qualified EMT-2',
+      'Qualified EMT-P',
+    ],
+    q14: 'Which country did you complete your EMS clinical placement in?',
+    q14o: ['Australia', 'Taiwan', 'Other'],
+    q15: 'Did you have any prior EMS experience before this placement?',
+    q15o: ['No prior experience', 'Yes'],
+    q16: 'Total duration of this clinical placement?',
+    q16o: ['< 100 hrs', '100–200 hrs', '201–500 hrs', '501–1000 hrs', '> 1000 hrs'],
+    q17: 'Overall, how would you describe the call volume at your placement station?',
+    q17o: ['Very low', 'Low', 'Moderate', 'High', 'Very high'],
+    q18: 'How was your preceptor arrangement structured?',
+    q18o: [
+      'One fixed preceptor per station rotation',
+      '2–3 fixed preceptors per station rotation',
+      'A different preceptor each shift',
+    ],
+    q19: 'Has your preceptor received formal teaching training or a preceptor certification?',
+    q19o: ['Yes', 'No', 'Unknown'],
+    q110: 'How long ago was your most recent initial EMS clinical placement?',
+    q110o: ['Within 1 year', '1–3 years', '3–5 years', 'More than 5 years'],
+    q111: 'Are you currently practicing EMS?',
+    q111o: ['Yes – active frontline EMS provider (incl. volunteer)', 'Yes – working in a hospital clinical unit', 'No – I have left EMS or healthcare'],
+    p2Title: 'Part 2: Core Preceptor Behavior Scale',
+    p2Inst: 'Please think of the preceptor who worked with you the most, or who had the greatest influence on you during this placement. Rate how frequently they demonstrated the following behaviors.',
+    p2Scale: '1 = Never　　4 = Occasionally　　7 = Always',
+    dimA: 'A: Relationship & Support',
+    dimB: 'B: Psychological Safety',
+    dimC: 'C: Role Modeling',
+    dimD: 'D: Feedback Quality',
+    dimE: 'E: Consistency & Stability',
+    q2items: [
+      { id:'Q2-1', dim:'A', text:'They made me feel welcome and treated me as a member of the team.' },
+      { id:'Q2-2', dim:'A', text:'When I was frustrated or stressed, they provided emotional support and encouragement.' },
+      { id:'Q2-3', dim:'A', text:'They proactively checked in on how I was doing and adapting.' },
+      { id:'Q2-4', dim:'B', text:'If I was unsure how to proceed, I felt safe asking them directly without fear.' },
+      { id:'Q2-5', dim:'B', text:'When I made mistakes, they treated it as a learning opportunity rather than just criticizing me.' },
+      { id:'Q2-6', dim:'B', text:'I could openly admit gaps in my knowledge to them without feeling ashamed.' },
+      { id:'Q2-7', dim:'B', reverse:true, text:'★ During the placement, their attitude made me feel like I was a burden. (Reverse-scored)' },
+      { id:'Q2-8', dim:'C', text:'The professionalism they demonstrated made me want to model myself after them.' },
+      { id:'Q2-9', dim:'C', text:'The calm composure they showed in critical or chaotic situations left a strong impression on me.' },
+      { id:'Q2-10', dim:'C', text:'They demonstrated a high standard of clinical technical skills.' },
+      { id:'Q2-11', dim:'D', text:'They gave me specific feedback, clearly identifying what I did well and what needed improvement.' },
+      { id:'Q2-12', dim:'D', text:'As the placement progressed, they consistently let me know whether I was improving.' },
+      { id:'Q2-13', dim:'D', text:'After a call, they discussed the management process with me.' },
+      { id:'Q2-14', dim:'E', text:'Regardless of call volume or time of day, they maintained a consistent approach to teaching.' },
+      { id:'Q2-15', dim:'E', text:'As my experience grew, they noticed my progress and gave me more autonomy.' },
+      { id:'Q2-16', dim:'E', text:'When practice differed from textbooks, they explained the reasons and helped me connect it to what I had learned.' },
+    ],
+    likertLabels7: ['1\nNever', '2', '3', '4\nOcc.', '5', '6', '7\nAlways'],
+    likertLabels7agree: ['1\nStr. Disagree', '2', '3', '4\nNeutral', '5', '6', '7\nStr. Agree'],
+    p31Title: 'Part 3: Novice Learner Questions',
+    p31Inst: 'Please rate how frequently your primary preceptor demonstrated the following behaviors.',
+    p31Scale: '1 = Never　2 = Rarely　3 = Occasionally　4 = Sometimes　5 = Frequently　6 = Usually　7 = Always',
+    q3a: [
+      { id:'Q3-1', text:'Their instructions were very clear, letting me know exactly what to do at each step.' },
+      { id:'Q3-2', text:'Before asking me to perform a skill, they first demonstrated it completely and correctly.' },
+      { id:'Q3-3', text:'Knowing they were watching (as my safety net) made me feel safe while performing procedures.' },
+      { id:'Q3-4', text:'When situations became chaotic or bystanders were distressed, they stepped in to shield me from direct exposure.' },
+      { id:'Q3-5', text:'They started me on simpler tasks and gradually progressed to more complex procedures as I gained confidence.' },
+    ],
+    p32Title: 'Part 3: Advanced Learner Questions',
+    p32Inst: 'Please rate how frequently your primary preceptor demonstrated the following behaviors.',
+    p32Scale: '1 = Never　2 = Rarely　3 = Occasionally　4 = Sometimes　5 = Frequently　6 = Usually　7 = Always',
+    q3b: [
+      { id:'Q3-6', text:'They often asked "Why did you make that decision?" to guide my clinical reasoning and understanding of pathophysiology.' },
+      { id:'Q3-7', text:'After a call, they first asked for my perspective before guiding me to reflect on the strengths and weaknesses of the management.' },
+      { id:'Q3-8', text:'When appropriate, they were willing to let me take on the Team Leader role on scene.' },
+      { id:'Q3-9', text:'When my management plan was reasonable, they supported me in carrying it out, even if it wasn\'t their first preference.' },
+      { id:'Q3-10', text:'They guided me on how to communicate with difficult patients or families, not just on clinical skills.' },
+      { id:'Q3-11', text:'They treated me as a future colleague and respected my professional judgment.' },
+      { id:'Q3-12', text:'They shared concrete strategies for managing work-related stress or emotional impact after traumatic calls.' },
+    ],
+    p41Title: 'Part 4: Short-term Outcomes',
+    p41Scale: '1 = Strongly Disagree　4 = Neutral　7 = Strongly Agree',
+    q4a: [
+      { id:'Q4-1', text:'After this placement, I feel confident I can pass my assessments and perform EMS duties competently.' },
+      { id:'Q4-2', text:'I feel very confident about responding independently to calls in the future.' },
+      { id:'Q4-3', text:'Overall, I am very satisfied with this clinical placement experience.' },
+    ],
+    p42Title: 'Part 4: Long-term Impact',
+    p42Scale: '1 = Strongly Disagree　4 = Neutral　7 = Strongly Agree',
+    q4b: [
+      { id:'Q4-4', text:'In my current practice, I find the concepts or skills that preceptor taught me to be very useful.' },
+      { id:'Q4-5', text:'In critical situations, I often hear that preceptor\'s reminders in my head, which helps me avoid mistakes.' },
+      { id:'Q4-6', text:'That preceptor\'s guidance and encouragement was a key reason I chose to remain in EMS.' },
+      { id:'Q4-7', text:'The way I mentor junior colleagues (or will in the future) is largely modeled after that preceptor.' },
+      { id:'Q4-8', text:'If I had been matched with a better preceptor, my clinical skills today would likely be stronger.' },
+    ],
+    thankyouTitle: 'Thank You for Participating!',
+    thankyouBody: 'Your response has been submitted successfully. Your valuable input will contribute to the reform of EMS clinical placement systems.<br><br>Thank you for your time. We wish you all the best.',
+    submitting: 'Submitting...',
+    submitError: 'Submission failed. Please try again.',
+  }
+};
+
+// ============================================================
+// ROUTING HELPERS
+// ============================================================
+function getQ13Status() { return answers['Q1-3'] || ''; }
+
+function isNovice() {
+  const v = getQ13Status();
+  return ['1','4'].includes(v);
+}
+
+function isAdvanced() {
+  const v = getQ13Status();
+  return ['2','3','5','7'].includes(v);
+}
+
+function isEMT2qualified() {
+  return getQ13Status() === '6';
+}
+
+function needsPart42() {
+  const v = getQ13Status();
+  return ['3','5','6','7'].includes(v);
+}
+
+function needsQ110() {
+  const v = getQ13Status();
+  return ['3','6','7'].includes(v);
+}
+
+function getTotalPages() {
+  return 5;
+}
+
+// ============================================================
+// RENDER ENGINE
+// ============================================================
+const app = document.getElementById('app');
+
+function render() {
+  if (page === 0) {
+    renderLang();
+  } else if (page === 1) {
+    renderConsent();
+  } else if (page === 2) {
+    renderPart1();
+  } else if (page === 3) {
+    renderPart2();
+  } else if (page === 4) {
+    renderPart3();
+  } else if (page === 5) {
+    renderPart4();
+  } else if (page === 6) {
+    renderThankyou();
+  }
+  updateProgress();
+}
+
+function updateProgress() {
+  const wrap = document.getElementById('progress-wrap');
+  const fill = document.getElementById('progress-fill');
+  const label = document.getElementById('progress-text');
+  const header = document.getElementById('survey-header');
+  const t = T[lang];
+
+  if (page === 0) {
+    wrap.classList.add('hidden');
+    header.classList.add('hidden');
+    return;
+  }
+  if (page === 6) {
+    wrap.classList.add('hidden');
+    header.classList.add('hidden');
+    return;
+  }
+  header.classList.remove('hidden');
+  document.getElementById('header-title').textContent = t.headerTitle;
+  document.getElementById('header-sub').textContent = t.headerSub;
+
+  if (page >= 1 && page <= 5) {
+    wrap.classList.remove('hidden');
+    const cur = page;
+    const total = 5;
+    const pct = Math.round((cur / total) * 100);
+    fill.style.width = pct + '%';
+    label.textContent = t.progress.replace('{cur}', cur).replace('{total}', total);
+  }
+}
+
+function renderLang() {
+  app.innerHTML = `
+  <div class="card lang-card">
+    <h2>🚑 EMS Preceptor Survey</h2>
+    <p>${T.zh.langPrompt}<br><small>${T.zh.langSub}</small></p>
+    <div class="lang-btns">
+      <button class="lang-btn" onclick="selectLang('zh')">🇹🇼 繁體中文</button>
+      <button class="lang-btn" onclick="selectLang('en')">🇦🇺 English</button>
+    </div>
+  </div>`;
+}
+
+function selectLang(l) {
+  lang = l;
+  page = 1;
+  render();
+}
+
+function renderConsent() {
+  const t = T[lang];
+  app.innerHTML = `
+  <div class="card">
+    <div class="section-title">${t.consentTitle}</div>
+    <div class="consent-box">${t.consentBody}</div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goBack()">${t.back}</button>
+      <button class="btn btn-primary" onclick="goNext()">${t.next}</button>
+    </div>
+  </div>`;
+}
+
+function renderPart1() {
+  const t = T[lang];
+  const st = getQ13Status();
+  const showQ110 = needsQ110();
+
+  app.innerHTML = `
+  <div class="card">
+    <div class="section-title">${t.p1Title}</div>
+
+    ${radioQ('Q1-1', t.q11, t.q11o, ['1','2'])}
+    ${numberQ('Q1-2', t.q12)}
+    ${radioQ('Q1-3', t.q13, t.q13o, ['1','2','3','4','5','6','7'], 'onQ13Change()')}
+
+    <div id="q110-wrap" class="${showQ110 ? '' : 'hidden'}">
+      ${radioQ('Q1-10', t.q110, t.q110o, ['1','2','3','4'])}
+      ${radioQ('Q1-11', t.q111, t.q111o, ['1','2','3'])}
+    </div>
+
+    ${radioQ('Q1-4', t.q14, t.q14o, ['1','2','3'])}
+    ${radioQ('Q1-5', t.q15, t.q15o, ['0','1'])}
+    ${radioQ('Q1-6', t.q16, t.q16o, ['1','2','3','4','5'])}
+    ${radioQ('Q1-7', t.q17, t.q17o, ['1','2','3','4','5'])}
+    ${radioQ('Q1-8', t.q18, t.q18o, ['1','2','3'])}
+    ${radioQ('Q1-9', t.q19, t.q19o, ['1','0','99'])}
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goBack()">${t.back}</button>
+      <button class="btn btn-primary" onclick="goNext()">${t.next}</button>
+    </div>
+  </div>`;
+
+  restoreRadios();
+  restoreNumber('Q1-2');
+}
+
+function onQ13Change() {
+  const val = document.querySelector('input[name="Q1-3"]:checked')?.value || '';
+  answers['Q1-3'] = val;
+  const wrap = document.getElementById('q110-wrap');
+  if (['3','6','7'].includes(val)) {
+    wrap.classList.remove('hidden');
+  } else {
+    wrap.classList.add('hidden');
+  }
+}
+
+function renderPart2() {
+  const t = T[lang];
+  const items = t.q2items;
+  const dims = ['A','B','C','D','E'];
+  const dimLabels = { A: t.dimA, B: t.dimB, C: t.dimC, D: t.dimD, E: t.dimE };
+
+  let html = `<div class="card">
+    <div class="section-title">${t.p2Title}</div>
+    <div class="section-sub">${t.p2Inst}<br><strong>${t.p2Scale}</strong></div>`;
+
+  dims.forEach(d => {
+    const dimItems = items.filter(i => i.dim === d);
+    html += `<div style="margin-bottom:20px">
+      <div style="font-weight:700;color:var(--primary);margin-bottom:8px;font-size:0.9rem">${dimLabels[d]}</div>
+      ${likertTable(dimItems, t.likertLabels7, 7)}
+    </div>`;
+  });
+
+  html += `<div class="btn-row">
+    <button class="btn btn-secondary" onclick="goBack()">${t.back}</button>
+    <button class="btn btn-primary" onclick="goNext()">${t.next}</button>
+  </div></div>`;
+
+  app.innerHTML = html;
+  restoreRadios();
+}
+
+function renderPart3() {
+  const t = T[lang];
+  const st = getQ13Status();
+
+  if (isEMT2qualified()) {
+    renderPart4();
+    return;
+  }
+
+  let title, inst, scale, items;
+  if (isNovice()) {
+    title = t.p31Title; inst = t.p31Inst; scale = t.p31Scale; items = t.q3a;
+  } else {
+    title = t.p32Title; inst = t.p32Inst; scale = t.p32Scale; items = t.q3b;
+  }
+
+  app.innerHTML = `<div class="card">
+    <div class="section-title">${title}</div>
+    <div class="section-sub">${inst}<br><strong>${scale}</strong></div>
+    ${likertTable(items, t.likertLabels7, 7)}
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goBack()">${t.back}</button>
+      <button class="btn btn-primary" onclick="goNext()">${t.next}</button>
+    </div>
+  </div>`;
+  restoreRadios();
+}
+
+function renderPart4() {
+  const t = T[lang];
+  const longTerm = needsPart42();
+  const title = longTerm ? t.p42Title : t.p41Title;
+  const scale = longTerm ? t.p42Scale : t.p41Scale;
+  const items = longTerm ? t.q4b : t.q4a;
+
+  app.innerHTML = `<div class="card">
+    <div class="section-title">${title}</div>
+    <div class="section-sub"><strong>${scale}</strong></div>
+    ${likertTable(items, t.likertLabels7agree, 7)}
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goBack()">${t.back}</button>
+      <button class="btn btn-success" onclick="submitSurvey()" id="submit-btn">${t.submit}</button>
+    </div>
+    <p id="submit-error" style="color:var(--danger);font-size:0.85rem;margin-top:8px;display:none">${t.submitError}</p>
+  </div>`;
+  restoreRadios();
+}
+
+function renderThankyou() {
+  const t = T[lang];
+  app.innerHTML = `<div class="card thankyou">
+    <div class="icon">✅</div>
+    <h2>${t.thankyouTitle}</h2>
+    <p>${t.thankyouBody}</p>
+  </div>`;
+}
+
+// ============================================================
+// WIDGET BUILDERS
+// ============================================================
+function radioQ(name, label, opts, vals, onchange) {
+  const qnum = name.replace('Q','').replace('-','-');
+  const onChange = onchange ? ` onchange="${onchange}"` : '';
+  let html = `<div class="question-block" id="block-${name}">
+    <div class="q-label"><span class="q-num">${name}</span>${label}</div>
+    <div class="options">`;
+  opts.forEach((o, i) => {
+    const v = vals[i];
+    html += `<label class="option-label">
+      <input type="radio" name="${name}" value="${v}"${onChange}> ${o}
+    </label>`;
+  });
+  html += `</div><div class="error-msg">${T[lang].required}</div></div>`;
+  return html;
+}
+
+function numberQ(name, label) {
+  return `<div class="question-block" id="block-${name}">
+    <div class="q-label"><span class="q-num">${name}</span>${label}</div>
+    <input type="number" id="${name}" name="${name}" min="15" max="80" placeholder="e.g. 25">
+    <div class="error-msg">${T[lang].requiredAge}</div>
+  </div>`;
+}
+
+function likertTable(items, labels, n) {
+  let html = `<div class="likert-wrap"><table class="likert-table">
+    <tr><th style="text-align:left;min-width:200px"></th>`;
+  labels.forEach(l => {
+    html += `<th style="white-space:pre-line;font-size:0.7rem">${l}</th>`;
+  });
+  html += '</tr>';
+
+  items.forEach(item => {
+    html += `<tr class="likert-row" id="block-${item.id}">
+      <td>${item.id} ${item.text}</td>`;
+    for (let v = 1; v <= n; v++) {
+      html += `<td><input type="radio" name="${item.id}" value="${v}"></td>`;
+    }
+    html += '</tr>';
+  });
+
+  html += '</table></div>';
+  return html;
+}
+
+// ============================================================
+// VALIDATION
+// ============================================================
+function validatePage() {
+  let ok = true;
+  const t = T[lang];
+
+  if (page === 2) {
+    const radios = ['Q1-1','Q1-3','Q1-4','Q1-5','Q1-6','Q1-7','Q1-8','Q1-9'];
+    radios.forEach(name => {
+      const block = document.getElementById('block-' + name);
+      if (!block) return;
+      const checked = document.querySelector(`input[name="${name}"]:checked`);
+      if (!checked) { block.classList.add('has-error'); ok = false; }
+      else block.classList.remove('has-error');
+    });
+    const ageEl = document.getElementById('Q1-2');
+    const ageBlock = document.getElementById('block-Q1-2');
+    if (!ageEl.value || isNaN(ageEl.value) || +ageEl.value < 15) {
+      ageBlock.classList.add('has-error'); ok = false;
+    } else ageBlock.classList.remove('has-error');
+
+    if (needsQ110()) {
+      ['Q1-10','Q1-11'].forEach(name => {
+        const block = document.getElementById('block-' + name);
+        if (!block) return;
+        const checked = document.querySelector(`input[name="${name}"]:checked`);
+        if (!checked) { block.classList.add('has-error'); ok = false; }
+        else block.classList.remove('has-error');
+      });
+    }
+  }
+
+  if (page === 3) {
+    T[lang].q2items.forEach(item => {
+      const row = document.getElementById('block-' + item.id);
+      if (!row) return;
+      const checked = document.querySelector(`input[name="${item.id}"]:checked`);
+      if (!checked) { row.classList.add('has-error'); ok = false; }
+      else row.classList.remove('has-error');
+    });
+  }
+
+  if (page === 4) {
+    const items = isNovice() ? T[lang].q3a : T[lang].q3b;
+    items.forEach(item => {
+      const row = document.getElementById('block-' + item.id);
+      if (!row) return;
+      const checked = document.querySelector(`input[name="${item.id}"]:checked`);
+      if (!checked) { row.classList.add('has-error'); ok = false; }
+      else row.classList.remove('has-error');
+    });
+  }
+
+  if (page === 5) {
+    const items = needsPart42() ? T[lang].q4b : T[lang].q4a;
+    items.forEach(item => {
+      const row = document.getElementById('block-' + item.id);
+      if (!row) return;
+      const checked = document.querySelector(`input[name="${item.id}"]:checked`);
+      if (!checked) { row.classList.add('has-error'); ok = false; }
+      else row.classList.remove('has-error');
+    });
+  }
+
+  if (!ok) {
+    const first = document.querySelector('.has-error');
+    if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+  return ok;
+}
+
+// ============================================================
+// COLLECT ANSWERS
+// ============================================================
+function collectAnswers() {
+  document.querySelectorAll('input[type=radio]:checked').forEach(el => {
+    answers[el.name] = el.value;
+  });
+  const ageEl = document.getElementById('Q1-2');
+  if (ageEl) answers['Q1-2'] = ageEl.value;
+  answers['Language'] = lang;
+}
+
+// ============================================================
+// NAV
+// ============================================================
+function goNext() {
+  collectAnswers();
+  if (!validatePage()) return;
+  page++;
+  window.scrollTo(0, 0);
+  render();
+}
+
+function goBack() {
+  page--;
+  if (page < 1) page = 1;
+  window.scrollTo(0, 0);
+  render();
+}
+
+// ============================================================
+// RESTORE
+// ============================================================
+function restoreRadios() {
+  Object.keys(answers).forEach(name => {
+    const val = answers[name];
+    const el = document.querySelector(`input[name="${name}"][value="${val}"]`);
+    if (el) {
+      el.checked = true;
+      el.closest('label')?.classList.add('selected');
+    }
+  });
+}
+
+function restoreNumber(name) {
+  const el = document.getElementById(name);
+  if (el && answers[name]) el.value = answers[name];
+}
+
+// ============================================================
+// SUBMIT  (改用 fetch 呼叫 GAS Web App，取代 google.script.run)
+// ============================================================
+function submitSurvey() {
+  collectAnswers();
+  if (!validatePage()) return;
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = T[lang].submitting;
+
+  fetch(GAS_WEB_APP_URL, {
+    method: 'POST',
+    // 用 text/plain 避免瀏覽器發出 CORS preflight (OPTIONS)，
+    // GAS 端還是能用 JSON.parse(e.postData.contents) 正常解析
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(answers)
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === 'ok') {
+        page = 6;
+        render();
+      } else {
+        throw new Error(data.message || 'Unknown error');
+      }
+    })
+    .catch(err => {
+      btn.disabled = false;
+      btn.textContent = T[lang].submit;
+      document.getElementById('submit-error').style.display = 'block';
+      console.error(err);
+    });
+}
+
+// ============================================================
+// BOOT
+// ============================================================
+render();
+</script>
+</body>
+</html>
