@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>迫切性／重要性矩陣評估問卷｜壯闊台灣聯盟</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&family=Noto+Sans+TC:wght@400;500;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FAFAF6; --paper:#FFFFFF; --ink:#20241F; --muted:#6B726B; --line:#E1E0D8;
+    --red:#B8402F; --amber:#C4881F; --green:#3A7A5C; --slate:#2C3B3E; --slate-tint:#EEF2F1;
+    --blue:#3D5A80;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Noto Sans TC','PingFang TC','Microsoft JhengHei',sans-serif; line-height:1.7;}
+  .wrap{max-width:920px; margin:0 auto; padding:44px 24px 100px;}
+
+  header.hero{border-bottom:2px solid var(--slate); padding-bottom:24px; margin-bottom:28px;}
+  header.hero .eyebrow{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--muted); letter-spacing:.08em; text-transform:uppercase;}
+  header.hero h1{font-family:'Noto Serif TC',serif; font-size:27px; margin:10px 0 14px;}
+  header.hero p{color:#3A403C; font-size:14px; max-width:700px; margin:0 0 8px;}
+
+  .toolbar{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:24px; position:sticky; top:0; background:var(--bg); padding:12px 0; z-index:10; border-bottom:1px solid var(--line);}
+  button.tool{font-family:'Noto Sans TC',sans-serif; font-size:13px; background:var(--slate); color:#fff; border:none; padding:9px 16px; border-radius:20px; cursor:pointer;}
+  button.tool.secondary{background:#fff; color:var(--slate); border:1px solid var(--slate);}
+  button.tool:hover{opacity:.85;}
+
+  .legend{display:flex; gap:14px; flex-wrap:wrap; font-size:12px; color:var(--muted); margin-bottom:30px;}
+  .legend span{display:flex; align-items:center; gap:5px;}
+  .dot{width:9px; height:9px; border-radius:50%; display:inline-block;}
+  .dot.r{background:var(--red);} .dot.a{background:var(--amber);} .dot.g{background:var(--green);} .dot.b{background:var(--blue);}
+
+  h2.cat-title{
+    font-family:'Noto Serif TC',serif; font-size:19px; margin:46px 0 18px;
+    padding:10px 16px; background:var(--slate); color:#fff; border-radius:6px;
+  }
+
+  .qcard{background:var(--paper); border:1px solid var(--line); border-left:6px solid var(--slate); border-radius:8px; padding:22px 26px; margin-bottom:18px;}
+  .qcard[data-src="both"]{border-left-color:var(--green);}
+  .qcard[data-src="doc"]{border-left-color:var(--blue);}
+  .qcard[data-src="interview"]{border-left-color:var(--amber);}
+  .qcard[data-src="conflict"]{border-left-color:var(--red);}
+
+  .qhead{display:flex; justify-content:space-between; align-items:flex-start; gap:14px; margin-bottom:8px;}
+  .qnum{font-family:'JetBrains Mono',monospace; font-size:12px; background:var(--slate); color:#fff; padding:3px 9px; border-radius:4px; flex-shrink:0;}
+  .qtext{font-size:15.5px; font-weight:700; flex:1;}
+  .qdesc{font-size:13px; color:#3A403C; margin-bottom:12px;}
+
+  .meta-row{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;}
+  .chip{font-size:11px; font-family:'JetBrains Mono',monospace; padding:3px 10px; border-radius:20px;}
+  .chip.both{background:#EAF3EE; color:var(--green);}
+  .chip.doc{background:#E9EEF7; color:var(--blue);}
+  .chip.interview{background:#FDF3E7; color:var(--amber);}
+  .chip.conflict{background:#FBEAE7; color:var(--red);}
+
+  .likert-row{display:grid; grid-template-columns:90px repeat(5,1fr); align-items:center; gap:6px; font-size:12.5px; margin-bottom:8px;}
+  .likert-row .label{color:var(--muted); font-size:12.5px; font-weight:500;}
+  .likert-row label{display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer; color:var(--muted); font-size:10.5px;}
+  .likert-row input[type="radio"]{accent-color:var(--slate); width:16px; height:16px;}
+
+  textarea.comment{width:100%; min-height:46px; border:1px solid var(--line); border-radius:6px; padding:10px 12px; font-family:'Noto Sans TC',sans-serif; font-size:13px; resize:vertical; background:#FDFDFB; margin-top:6px;}
+  .na{font-size:12px; color:var(--muted); margin-top:4px; display:flex; align-items:center; gap:6px;}
+
+  .note-box{background:var(--slate-tint); border:1px dashed #C9D2CE; border-radius:8px; padding:16px 20px; margin:20px 0 40px; font-size:13px; color:#3A403C;}
+  .note-box b{color:var(--slate);}
+
+  @media print{
+    .toolbar{display:none;} body{background:#fff;}
+    .qcard{break-inside:avoid; border:1px solid #ccc;}
+  }
+  @media (max-width:700px){ .likert-row{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">災防NGO與AI協作先導計畫 · 迫切性／重要性矩陣評估問卷</span>
+    <h1>壯闊台灣聯盟｜AI導入需求優先序評估</h1>
+    <p>以下27項需求（不含政策建言性質之N11）整理自訪談逐字稿與貴聯盟內部「工作流程優化與技術協作需求說明」文件，請針對每一項需求，分別評估其<b>迫切性</b>（現在有多急需要處理）與<b>重要性</b>（對組織運作的影響有多大）。兩者評分不一定一致——有些事情很重要但不急，有些事情很急但影響範圍小。</p>
+    <p>評分標準：1＝非常低，5＝非常高。如該項您認為不適用或不了解，請勾選「不適用／不熟悉」。</p>
+  </header>
+
+  <div class="toolbar">
+    <button class="tool" onclick="exportAnswers()">下載填答結果（文字檔）</button>
+    <button class="tool secondary" onclick="window.print()">列印本頁</button>
+  </div>
+
+  <div class="legend">
+    <span><span class="dot g"></span>訪談＋盤點文件雙重印證</span>
+    <span><span class="dot b"></span>僅盤點文件提及</span>
+    <span><span class="dot a"></span>僅訪談提及</span>
+    <span><span class="dot r"></span>技術路線待釐清</span>
+  </div>
+
+  <h2 class="cat-title">類別一｜資訊過載處理</h2>
+
+  <div class="qcard" data-src="both" data-id="n1">
+    <div class="qhead"><span class="qnum">N1</span><span class="qtext">海量志工群組訊息即時分類與自動回覆</span></div>
+    <div class="qdesc">2000–4000人志工群組訊息量大，需AI協助快速簡單回覆常見問題，並區分「提問」與「回報資訊」</div>
+    <div class="meta-row"><span class="chip both">訪談＋盤點文件雙重印證</span></div>
+    <div class="likert-row"><span class="label">迫切性</span><label><input type="radio" name="n1-urg" value="1">1</label><label><input type="radio" name="n1-urg" value="2">2</label><label><input type="radio" name="n1-urg" value="3">3</label><label><input type="radio" name="n1-urg" value="4">4</label><label><input type="radio" name="n1-urg" value="5">5</label></div>
+    <div class="likert-row"><span class="label">重要性</span><label><input type="radio" name="n1-imp" value="1">1</label><label><input type="radio" name="n1-imp" value="2">2</label><label><input type="radio" name="n1-imp" value="3">3</label><label><input type="radio" name="n1-imp" value="4">4</label><label><input type="radio" name="n1-imp" value="5">5</label></div>
+    <label class="na"><input type="checkbox" class="na-check">不適用／不熟悉</label>
+    <textarea class="comment" placeholder="補充意見（選填）"></textarea>
+  </div>
+
+  <div class="qcard" data-src="interview" data-id="n2">
+    <div class="qhead"><span class="qnum">N2</span><span class="qtext">災情通報資料查核／去重／分類／狀態更新／整合dashboard</span></div>
+    <div class="qdesc">既有災情通報工具資料量增加後，需AI協助查核（如照片時間地點比對）、合併重複通報、更新處理狀態</div>
+    <div class="meta-row"><span class="chip interview">僅訪談提及</span></div>
+    <div class="likert-row"><span class="label">迫切性</span><label><input type="radio" name="n2-urg" value="1">1</label><label><input type="radio" name="n2-urg" value="2">2</label><label><input type="radio" name="n2-urg" value="3">3</label><label><input type="radio" name="n2-urg" value="4">4</label><label><input type="radio" name="n2-urg" value="5">5</label></div>
+    <div class="likert-row"><span class="label">重要性</span><label><input type="radio" name="n2-imp" value="1">1</label><label><input type="radio" name="n2-imp" value="2">2</label><label><input type="radio" name="n2-imp" value="3">3</label><label><input type="radio" name="n2-imp" value="4">4</label><label><input type="radio" name="n2-imp" value="5">5</label></div>
+    <label class="na"><input type="checkbox" class="na-check">不適用／不熟悉</label>
+    <textarea class="comment" placeholder="補充意見（選填）"></textarea>
+  </div>
+
+  <div class="qcard" data-src="conflict" data-id="n3">
+    <div class="qhead"><span class="qnum">N3</span><span class="qtext">即時通訊訊息匯整與每日摘要通知閘道器</span></div>
+    <div class="qdesc">建立訊息過濾與自動標記，提供每日專案公告摘要與關鍵訊息推送（⚠原盤點文件指定Google Chat，與貴聯盟轉向Mattermost之方向待釐清，請填答時以貴聯盟實際規劃之通訊平台為準）</div>
+    <div class="meta-row"><span class="chip conflict">技術路線待釐清</span></div>
+    <div class="likert-row"><span class="label">迫切性</span><label><input type="radio" name="n3-urg" value="1">1</label><label><input type="radio" name="n3-urg" value="2">2</label><label><input type="radio" name="n3-urg" value="3">3</label><label><input type="radio" name="n3-urg" value="4">4</label><label><input type="radio" name="n3-urg" value="5">5</label></div>
+    <div class="likert-row"><span class="label">重要性</span><label><input type="radio" name="n3-imp" value="1">1</label><label><input type="radio" name="n3-imp" value="2">2</label><label><input type="radio" name="n3-imp" value="3">3</label><label><input type="radio" name="n3-imp" value="4">4</label><label><input type="radio" name="n3-imp" value="5">5</label></div>
+    <label class="na"><input type="checkbox" class="na-check">不適用／不熟悉</label>
+    <textarea class="comment" placeholder="補充意見（選填）"></textarea>
+  </div>
+
+  <div class="qcard" data-src="doc" data-id="n4">
+    <div class="qhead"><span class="qnum">N4</span><span class="qtext">實時專案進度儀表板</span></div>
+    <div class="qdesc">整合跨部門協作數據，即時反映專案進度與資源分佈，免除人工口頭詢問（行政專案管理用途，與N2災情資料dashboard不同）</div>
+    <div class="meta-row"><span class="chip doc">僅盤點文件提及</span></div>
+    <div class="likert-row"><span class="label">迫切性</span><label><input type="radio" name="n4-urg" value="1">1</label><label><input type="radio" name="n4-urg" value="2">2</label><label><input type="radio" name="n4-urg" value="3">3</label><label><input type="radio" name="n4-urg" value="4">4</label><label><input type="radio" name="n4-urg" value="5">5</label></div>
+    <div class="likert-row"><span class="label">重要性</span><label><input type="radio" name="n4-imp" value="1">1</label><label><input type="radio" name="n4-imp" value="2">2</label><label><input type="radio" name="n4-imp" value="3">3</label><label><input type="radio" name="n4-imp" value="4">4</label><label><input type="radio" name="n4-imp" value="5">5</label></div>
+    <label class="na"><input type="checkbox" class="na-check">不適用／不熟悉</label>
+    <textarea class="comment" placeholder="補充意見（選填）"></textarea>
+  </div>
+
+  <h2 class="cat-title">類別二｜韌性與離線優先架構</h2>
+
+  <div class="qcard" data-src="interview" data-id="n5">
+    <div class="qhead"><span class="qnum">N5</span><span class="qtext">在地端AI，不依賴網路連線</span></div>
+    <div class="qdesc">AI工具須能於本地端運作；現場即時決策必須離線可用，事後資料分析彙整可延遲至恢復連線再處理</div>
+    <div class="meta-row"><span class="chip interview">僅訪談提及</span></div>
+    <div class="likert-row"><span class="label">迫切性</span><label><input type="radio" name="n5-urg" value="1">1</label><label><input type="radio" name="n5-urg" value="2">2</label><label><input type="radio" name="n5-urg" value="3">3</label><label><input type="radio" name="n5-urg" value="4">4</label><label><input type="radio" name="n5-urg" value="5">5</label></div>
+    <div class="likert-row"><span class="label">重要性</span><label><input type="radio" name="n5-imp" value="1">1</label><label><input type="radio" name="n5-imp" value="2">2</label><label><input type="radio" name="n5-imp" value="3">3</label><label><input type="radio" name="n5-imp" value="4">4</label><label><input type="radio" name="n5-imp" value="5">5</label></div>
+    <label class="na"><input type="checkbox" class="na-check">不適用／不熟悉</label>
+    <textarea class="comment" placeholder="補充意見（選填）"></textarea>
+  </div>
+
+  <div class="qcard" data-src="interview" data-id="n6">
+    <div class="qhead"><span class="qnum">N6</span><span class="qtext">Mesh網路離線資料交換</span></div>
+    <div class="qdesc">App具備透過Mesh網路交換資料包（含地圖圖層更新）之離線同步功能</div>
+    <div class="meta-row"><span class="chip interview">僅訪談提及</span></div>
+    <div class="likert-row"><span class="label">迫切性</span><label><input type="radio" name="n6-urg" value="1">1</label><label><input type="radio" name="n6-urg" value="2">2</label><label><input type="radio" name="n6-urg" value="3">3</label><label><input type="radio" name="n6-urg" value="4">4</label><label><input type="radio" name="n6-urg" value="5">5</label></div>
+    <div class="likert-row"><span class="label">重要性</span><label><input type="radio" name="n6-imp" value="1">1</label><label><input type="radio" name="n6-imp" value="2">2</label><label><input type="radio" name="n6-imp" value="3">3</label><label><input type="radio" name="n6-imp" value="4">4</label><label><input type="radio" name="n6-imp" value="5">5</label></div>
+    <label class="na"><input type="checkbox" class="na-check">不適用／不熟悉</label>
+    <textarea class="comment" placeholder="補充意見（選填）"></textarea>
+  </div>
+
+  <div class="qcard" data-src="interview" data-id="n7">
+    <div class="qhead"><span class="qnum">N7</span><span class="qtext">雙模式AI運算架構（連網集中式主機／斷網邊緣運算）</span></div>
+    <div class="qdesc">連網時以集中式AI主機處理較快，斷網時切換為本地端邊緣運算</div>
+    <div class="meta-row"><span class="chip interview">僅訪談提及</span></div>
+    <div class="likert-row"><span class="label">迫切性</span><label><input type="radio" name="n7-urg" value="1">1</label><label><input type="radio" name="n7-urg" value="2">2</label><label><input type="radio" name="n7-urg" value="3">3</label><label><input type="radio" name="n7-urg" value="4">4</label><label><input type="radio" name="n7-urg" value="5">5</label></div>
+    <div class="likert-row"><span class="label">重要性</span><label><input type="radio" name="n7-imp" value="1">1</label><label><input type="radio" name="n7-imp" value="2">2</label><label><input type="radio" name="n7-imp" value="3">3</label><label><input type="radio" name="n7-imp" value="4">4</label><label><input type="radio" name="n7-imp" value="5">5</label></div>
+    <label class="na"><input type="checkbox" class="na-check">不適用／不熟悉</label>
+    <textarea class="comment" placeholder="補充意見（選填）"></textarea>
+  </div>
+
+  <h2 class="cat-title">類別三｜資料主權與平台依賴風險</h2>
+
+  <div class="qcard" data-src="interview" data-id="n8">
+    <div class="qhead"><span class="qnum">N8</span><span class="qtext">自架開源通訊系統（降低第三方平台依賴）</span></div>
+    <div class="qdesc">因過去Line群組遭無預警刪除、官方功能被下架之經驗，轉向自架開源系統與本地伺服器</div>
+    <div class="meta-row"><span class="chip interview">僅訪談提及</span></div>
+    <div class="likert-row"><span class="label">迫切性</span><label><input type="radio" name="n8-urg" value="1">1</label><label><input type="radio" name="n8-urg" value="2">2</label><label><input type="radio" name="n8-urg" value="3">3</label><label><input type="radio" name="n8-urg" value="4">4</label><label><input type="radio" name="n8-urg" value="5">5</label></div>
+    <div class="likert-row"><span class="label">重要性</span><label><input type="radio" name="n8-imp" value="1">1</label><label><input type="radio" name="n8-imp" value="2">2</label><label><input type="radio" name="n8-imp" value="3">3</label><label><input type="radio" name="n8-imp" value="4">4</label><label><input type="radio" name="n8-imp" value="5">5</label></div>
+    <label class="na"><input type="checkbox" class="na-check">不適用／不熟悉</label>
+    <textarea class="comment" placeholder="補充意見（選填）"></textarea>
+  </div>
+
+  <div class="qcard" data-src="both" data-id="n9">
+    <div class="qhead"><span class="qnum">N9</span><span class="qtext">雲端權限隔離與檔案版本管理系統</span></div>
+    <div class="qdesc">細粒度資料夾存取控制與版本管理；對應內部「批次下載受限，須逐筆手動下載61次」之實際痛點</div>
+    <div class="meta-row"><span class="chip both">訪談＋盤點文件雙重印證</span></div>
+    <div class="likert-row"><span class="label">迫切性</span><label><input type="radio" name="n9-urg" value="1">1</label><label><input type="radio" name="n9-urg" value="2">2</label><label><input type="radio" name="n9-urg" value="3">3</label><label><input type="radio" name="n9-urg" value="4">4</label><label><input type="radio" name="n9-urg" value="5">5</label></div>
+    <div class="likert-row"><span class="label">重要性</span><label><input type="radio" name="n9-imp" value="1">1</label><label><input type="radio" name="n9-imp" value="2">2</label><label><input type="radio" name="n9-imp" value="3">3</label><label><input type="radio" name="n9-imp" value="4">4</label><label><input type="radio" name="n9-imp" value="5">5</label></div>
+    <label class="na"><input type="checkbox" class="na-check">不適用／不熟悉</label>
+    <textarea class="comment" placeholder="補充意見（選填）"></textarea>
+  </div>
+
+  <div class="qcard" data-src="both" data-id="n10">
+    <div class="qhead"><span class="qnum">N10</span><span class="qtext">跨系統數據自動化整合（多資料庫Master整合）</span></div>
+    <div class="qdesc">課程、教官、志工、App等多個分散資料庫整合為單一權威資料源，並提供一鍵報表與AI月度自動解讀</div>
+    <div class="meta-row"><span class="chip both">訪談＋盤點文件雙重印證</span></div>
+    <div class="likert-row"><span class="label">迫切性</span><label><input type="radio" name="n10-urg" value="1">1</label><label><input type="radio" name="n10-urg" value="2">2</label><label><input type="radio" name="n10-urg" value="3">3</label><label><input type="radio" name="n10-urg" value="4">4</label><label><input type="radio" name="n10-urg" value="5">5</label></div>
+    <div class="likert-row"><span class="label">重要性</span><label><input type="radio" name="n10-imp" value="1">1</label><label><input type="radio" name="n10-imp" value="2">2</label><label><input type="radio" name="n10-imp" value="3">3</label><label><input type="radio" name="n10-imp" value="4">4</label><label><input type="radio" name="n10-imp" value="5">5</label></div>
+    <label class="na"><input type="checkbox" class="na-check">不適用／不熟悉</label>
+    <textarea class="comment" placeholder="補充意見（選填）"></textarea>
+  </div>
+
+  <h2 class="cat-title">類別四｜人員照護與情緒勞動邊界</h2>
+
+  <div class="qcard" data-src="interview" data-id="n12">
+    <div class="qhead"><span class="qnum">N12</span><span class="qtext">志工連續出勤工時提醒</span></div>
+    <div class="qdesc">志工常不願主動休息，AI可提醒現場負責人某志工已出勤過久，適時介入安排休息</div>
+    <div class="meta-row"><span class="chip interview">僅訪談提及</span></div>
+    <div class="likert-row"><span class="label">迫切性</span><label><input type="radio" name="n12-urg" value="1">1</label><label><input type="radio" name="n12-urg" value="2">2</label><label><input type="radio" name="n12-urg" value="3">3</label><label><input type="radio" name="n12-urg" value="4">4</label><label><input type="radio" name="n12-urg" value="5">5</label></div>
+    <div class="likert-row"><span class="label">重要性</span><label><input type="radio" name="n12-imp" value="1">1</label><label><input type="radio" name="n12-imp" value="2">2</label><label><input type="radio" name="n12-imp" value="3">3</label><label><input type="radio" name="n12-imp" value="4">4</label><label><input type="radio" name="n12-imp" value="5">5</label></div>
+    <label class="na"><input type="checkbox" class="na-check">不適用／不熟悉</label>
+    <textarea class="comment" placeholder="補充意見（選填）"></textarea>
+  </div>
+
+  <div class="qcard" data-src="interview" data-id="n13">
+    <div class="qhead"><span class="qnum">N13</span><span class="qtext">工作人員因志工即時回覆期待產生之情緒勞動與過勞</span></div>
+    <div class="qdesc">志工普遍期待即時（含深夜、假日）回覆，工作人員基於責任感難以拒絕，形成隱形工時與情緒負擔</div>
+    <div class="meta-row"><span class="chip interview">僅訪談提及</span></div>
+    <div class="likert-row"><span class="label">迫切性</span><label><input type="radio" name="n13-urg" value="1">1</label><label><input type="radio" name="n13-urg" value="2">2</label><label><input type="radio" name="n13-urg" value="3">3</label><label><input type="radio" name="n13-urg" value="4">4</label><label><input type="radio" name="n13-urg" value="5">5</label></div>
+    <div class="likert-row"><span class="label">重要性</span><label><input type="radio" name="n13-imp" value="1">1</label><label><input type="radio" name="n13-imp" value="2">2</label><label><input type="radio" name="n13-imp" value="3">3</label><label><input type="radio" name="n13-imp" value="4">4</label><label><input type="radio" name="n13-imp" value="5">5</label></div>
+    <label class="na"><input type="checkbox" class="na-check">不適用／不熟悉</label>
+    <textarea class="comment" placeholder="補充意見（選填）"></textarea>
+  </div>
+
+  <h2 class="cat-title">類別五｜物流與後勤追蹤</h2>
+
+  <div class="qcard" data-src="interview" data-id="n14">
+    <div class="qhead"><span class="qnum">N14</span><span class="qtext">物資流向追蹤與補給需求預測</span></div>
+    <div class="qdesc">動員時大量物資發放缺乏記錄機制，無法掌握總發放量與剩餘量，亦有重複發放之虞</div>
+    <div class="meta-row"><span class="chip interview">僅訪談提及</span></div>
+    <div class="likert-row"><span class="label">迫切性</span><label><input type="radio" name="n14-urg" value="1">1</label><label><input type="radio" name="n14-urg" value="2">2</label><label><input type="radio" name="n14-urg" value="3">3</label><label><input type="radio" name="n14-urg" value="4">4</label><label><input type="radio" name="n14-urg" value="5">5</label></div>
+    <div class="likert-row"><span class="label">重要性</span><label><input type="radio" name="n14-imp" value="1">1</label><label><input type="radio" name="n14-imp" value="2">2</label><label><input type="radio" name="n14-imp" value="3">3</label><label><input type="radio" name="n14-imp" value="4">4</label><label><input type="radio" name="n14-imp" value="5">5</label></div>
+    <label class="na"><input type="checkbox" class="na-check">不適用／不熟悉</label>
+    <textarea class="comment" placeholder="補充意見（選填）"></textarea>
+  </div>
+
+  <div class="qcard" data-src="interview" data-id="n15">
+    <div class="qhead"><span class="qnum">N15</span><span class="qtext">現場人力／車輛調度記錄</span></div>
+    <div class="qdesc">現場調度人力、車輛送往各地時，缺乏記錄「送了多少人去哪裡」的機制，目前僅能仰賴手機聯繫</div>
+    <div class="meta-row"><span class="chip interview">僅訪談提及</span></div>
+    <div class="likert-row"><span class="label">迫切性</span><label><input type="radio" name="n15-urg" value="1">1</label><label><input type="radio" name="n15-urg" value="2">2</label><label><input type="radio" name="n15-urg" value="3">3</label><label><input type="radio" name="n15-urg" value="4">4</label><label><input type="radio" name="n15-urg" value="5">5</label></div>
+    <div class="likert-row"><span class="label">重要性</span><label><input type="radio" name="n15-imp" value="1">1</label><label><input type="radio" name="n15-imp" value="2">2</label><label><input type="radio" name="n15-imp" value="3">3</label><label><input type="radio" name="n15-imp" value="4">4</label><label><input type="radio" name="n15-imp" value="5">5</label></div>
+    <label class="na"><input type="checkbox" class="na-check">不適用／不熟悉</label>
+    <textarea class="comment" placeholder="補充意見（選填）"></textarea>
+  </div>
+
+  <div class="qcard" data-src="interview" data-id="n16">
+    <div class="qhead"><span class="qnum">N16</span><span class="qtext">現場人力不足時的資料建檔問題（免持／語音輸入）</span></div>
+    <div class="qdesc">現場人力多投入直接救援／照護工作，無暇同時進行資料輸入，需要免持或低操作負荷的建檔方式</div>
+    <div class="meta-row"><span class="chip interview">僅訪談提及</span></div>
+    <div class="likert-row"><span class="label">迫切性</span><label><input type="radio" name="n16-urg" value="1">1</label><label><input type="radio" name="n16-urg" value="2">2</label><label><input type="radio" name="n16-urg" value="3">3</label><label><input type="radio" name="n16-urg" value="4">4</label><label><input type="radio" name="n16-urg" value="5">5</label></div>
+    <div class="likert-row"><span class="label">重要性</span><label><input type="radio" name="n16-imp" value="1">1</label><label><input type="radio" name="n16-imp" value="2">2</label><label><input type="radio" name="n16-imp" value="3">3</label><label><input type="radio" name="n16-imp" value="4">4</label><label><input type="radio" name="n16-imp" value="5">5</label></div>
+    <label class="na"><input type="checkbox" class="na-check">不適用／不熟悉</label>
+    <textarea class="comment" placeholder="補充意見（選填）"></textarea>
+  </div>
+
+  <h2 class="cat-title">類別六｜行政流程自動化與報到／身分驗證機制</h2>
+
+  <div class="qcard" data-src="doc" data-id="n17">
+    <div class="qhead"><span class="qnum">N17</span><span class="qtext">多管道金流自動化對帳模組</span></div>
+    <div class="qdesc">串接第三方支付、捐款系統、課程系統API，自動比對撥款、彙整名單，產出對帳單與發票核對紀錄</div>
+    <div class="meta-row"><span class="chip doc">僅盤點文件提及</span></div>
+    <div class="likert-row"><span class="label">迫切性</span><label><input type="radio" name="n17-urg" value="1">1</label><label><input type="radio" name="n17-urg" value="2">2</label><label><input type="radio" name="n17-urg" value="3">3</label><label><input type="radio" name="n17-urg" value="4">4</label><label><input type="radio" name="n17-urg" value="5">5</label></div>
+    <div class="likert-row"><span class="label">重要性</span><label><input type="radio" name="n17-imp" value="1">1</label><label><input type="radio" name="n17-imp" value="2">2</label><label><input type="radio" name="n17-imp" value="3">3</label><label><input type="radio" name="n17-imp" value="4">4</label><label><input type="radio" name="n17-imp" value="5">5</label></div>
+    <label class="na"><input type="checkbox" class="na-check">不適用／不熟悉</label>
+    <textarea class="comment" placeholder="補充意見（選填）"></textarea>
+  </div>
+
+  <div class="qcard" data-src="doc" data-id="n18">
+    <div class="qhead"><span class="qnum">N18</span><span class="qtext">憑證與名片智慧識別系統</span></div>
+    <div class="qdesc">支出憑證、名片拍照/掃描辨識，自動擷取統編、日期、金額、聯絡人等欄位並建檔</div>
+    <div class="meta-row"><span class="chip doc">僅盤點文件提及</span></div>
+    <div class="likert-row"><span class="label">迫切性</span><label><input type="radio" name="n18-urg" value="1">1</label><label><input type="radio" name="n18-urg" value="2">2</label><label><input type="radio" name="n18-urg" value="3">3</label><label><input type="radio" name="n18-urg" value="4">4</label><label><input type="radio" name="n18-urg" value="5">5</label></div>
+    <div class="likert-row"><span class="label">重要性</span><label><input type="radio" name="n18-imp" value="1">1</label><label><input type="radio" name="n18-imp" value="2">2</label><label><input type="radio" name="n18-imp" value="3">3</label><label><input type="radio" name="n18-imp" value="4">4</label><label><input type="radio" name="n18-imp" value="5">5</label></div>
+    <label class="na"><input type="checkbox" class="na-check">不適用／不熟悉</label>
+    <textarea class="comment" placeholder="補充意見（選填）"></textarea>
+  </div>
+
+  <div class="qcard" data-src="both" data-id="n19">
+    <div class="qhead"><span class="qnum">N19</span><span class="qtext">條件觸發型自動化郵件發送系統</span></div>
+    <div class="qdesc">依排班/課程狀態自動觸發郵件（開課前通知、報名成功回覆、參加證明、滿意度回饋彙整）</div>
+    <div class="meta-row"><span class="chip both">訪談＋盤點文件雙重印證</span></div>
+    <div class="likert-row"><span class="label">迫切性</span><label><input type="radio" name="n19-urg" value="1">1</label><label><input type="radio" name="n19-urg" value="2">2</label><label><input type="radio" name="n19-urg" value="3">3</label><label><input type="radio" name="n19-urg" value="4">4</label><label><input type="radio" name="n19-urg" value="5">5</label></div>
+    <div class="likert-row"><span class="label">重要性</span><label><input type="radio" name="n19-imp" value="1">1</label><label><input type="radio" name="n19-imp" value="2">2</label><label><input type="radio" name="n19-imp" value="3">3</label><label><input type="radio" name="n19-imp" value="4">4</label><label><input type="radio" name="n19-imp" value="5">5</label></div>
+    <label class="na"><input type="checkbox" class="na-check">不適用／不熟悉</label>
+    <textarea class="comment" placeholder="補充意見（選填）"></textarea>
+  </div>
+
+  <div class="qcard" data-src="doc" data-id="n20">
+    <div class="qhead"><span class="qnum">N20</span><span class="qtext">地理資訊系統與主動式災害預警關懷模組</span></div>
+    <div class="qdesc">將夥伴資料視覺化，比對氣象署災害潛勢資料，警報發布時自動通知警戒區內夥伴（後台關懷通知用途，與N21現場標記工具不同）</div>
+    <div class="meta-row"><span class="chip doc">僅盤點文件提及</span></div>
+    <div class="likert-row"><span class="label">迫切性</span><label><input type="radio" name="n20-urg" value="1">1</label><label><input type="radio" name="n20-urg" value="2">2</label><label><input type="radio" name="n20-urg" value="3">3</label><label><input type="radio" name="n20-urg" value="4">4</label><label><input type="radio" name="n20-urg" value="5">5</label></div>
+    <div class="likert-row"><span class="label">重要性</span><label><input type="radio" name="n20-imp" value="1">1</label><label><input type="radio" name="n20-imp" value="2">2</label><label><input type="radio" name="n20-imp" value="3">3</label><label><input type="radio" name="n20-imp" value="4">4</label><label><input type="radio" name="n20-imp" value="5">5</label></div>
+    <label class="na"><input type="checkbox" class="na-check">不適用／不熟悉</label>
+    <textarea class="comment" placeholder="補充意見（選填）"></textarea>
+  </div>
+
+  <div class="qcard" data-src="interview" data-id="n21">
+    <div class="qhead"><span class="qnum">N21</span><span class="qtext">輕量化地圖標記工具（非完整GIS功能）</span></div>
+    <div class="qdesc">現行GIS工具（QGIS）功能過於複雜，實際只需標點、簡易呈現，不需3D或遙測等進階功能</div>
+    <div class="meta-row"><span class="chip interview">僅訪談提及</span></div>
+    <div class="likert-row"><span class="label">迫切性</span><label><input type="radio" name="n21-urg" value="1">1</label><label><input type="radio" name="n21-urg" value="2">2</label><label><input type="radio" name="n21-urg" value="3">3</label><label><input type="radio" name="n21-urg" value="4">4</label><label><input type="radio" name="n21-urg" value="5">5</label></div>
+    <div class="likert-row"><span class="label">重要性</span><label><input type="radio" name="n21-imp" value="1">1</label><label><input type="radio" name="n21-imp" value="2">2</label><label><input type="radio" name="n21-imp" value="3">3</label><label><input type="radio" name="n21-imp" value="4">4</label><label><input type="radio" name="n21-imp" value="5">5</label></div>
+    <label class="na"><input type="checkbox" class="na-check">不適用／不熟悉</label>
+    <textarea class="comment" placeholder="補充意見（選填）"></textarea>
+  </div>
+
+  <div class="qcard" data-src="doc" data-id="n22">
+    <div class="qhead"><span class="qnum">N22</span><span class="qtext">網絡公開資訊自動爬取與CRM動態比對服務</span></div>
+    <div class="qdesc">定期爬取政府機關、學校官網公開資訊，比對現有資料庫，自動產出異動清單或補全新進組織資料</div>
+    <div class="meta-row"><span class="chip doc">僅盤點文件提及</span></div>
+    <div class="likert-row"><span class="label">迫切性</span><label><input type="radio" name="n22-urg" value="1">1</label><label><input type="radio" name="n22-urg" value="2">2</label><label><input type="radio" name="n22-urg" value="3">3</label><label><input type="radio" name="n22-urg" value="4">4</label><label><input type="radio" name="n22-urg" value="5">5</label></div>
+    <div class="likert-row"><span class="label">重要性</span><label><input type="radio" name="n22-imp" value="1">1</label><label><input type="radio" name="n22-imp" value="2">2</label><label><input type="radio" name="n22-imp" value="3">3</label><label><input type="radio" name="n22-imp" value="4">4</label><label><input type="radio" name="n22-imp" value="5">5</label></div>
+    <label class="na"><input type="checkbox" class="na-check">不適用／不熟悉</label>
+    <textarea class="comment" placeholder="補充意見（選填）"></textarea>
+  </div>
+
+  <div class="qcard" data-src="doc" data-id="n23">
+    <div class="qhead"><span class="qnum">N23</span><span class="qtext">課程排班自動同步至Google行事曆</span></div>
+    <div class="qdesc">後台排班資料（人數、主教、分組名單）雙向同步至Google行事曆，免除人工複製貼上</div>
+    <div class="meta-row"><span class="chip doc">僅盤點文件提及</span></div>
+    <div class="likert-row"><span class="label">迫切性</span><label><input type="radio" name="n23-urg" value="1">1</label><label><input type="radio" name="n23-urg" value="2">2</label><label><input type="radio" name="n23-urg" value="3">3</label><label><input type="radio" name="n23-urg" value="4">4</label><label><input type="radio" name="n23-urg" value="5">5</label></div>
+    <div class="likert-row"><span class="label">重要性</span><label><input type="radio" name="n23-imp" value="1">1</label><label><input type="radio" name="n23-imp" value="2">2</label><label><input type="radio" name="n23-imp" value="3">3</label><label><input type="radio" name="n23-imp" value="4">4</label><label><input type="radio" name="n23-imp" value="5">5</label></div>
+    <label class="na"><input type="checkbox" class="na-check">不適用／不熟悉</label>
+    <textarea class="comment" placeholder="補充意見（選填）"></textarea>
+  </div>
+
+  <div class="qcard" data-src="both" data-id="n24">
+    <div class="qhead"><span class="qnum">N24</span><span class="qtext">個資保護型自動化文件匯出服務（含電子簽名）</span></div>
+    <div class="qdesc">一鍵安全匯出學員資料並自動套版生成簽到表；現場需合法合規之電子簽名機制（如保險/切結場合）</div>
+    <div class="meta-row"><span class="chip both">訪談＋盤點文件雙重印證</span></div>
+    <div class="likert-row"><span class="label">迫切性</span><label><input type="radio" name="n24-urg" value="1">1</label><label><input type="radio" name="n24-urg" value="2">2</label><label><input type="radio" name="n24-urg" value="3">3</label><label><input type="radio" name="n24-urg" value="4">4</label><label><input type="radio" name="n24-urg" value="5">5</label></div>
+    <div class="likert-row"><span class="label">重要性</span><label><input type="radio" name="n24-imp" value="1">1</label><label><input type="radio" name="n24-imp" value="2">2</label><label><input type="radio" name="n24-imp" value="3">3</label><label><input type="radio" name="n24-imp" value="4">4</label><label><input type="radio" name="n24-imp" value="5">5</label></div>
+    <label class="na"><input type="checkbox" class="na-check">不適用／不熟悉</label>
+    <textarea class="comment" placeholder="補充意見（選填）"></textarea>
+  </div>
+
+  <div class="qcard" data-src="interview" data-id="n25">
+    <div class="qhead"><span class="qnum">N25</span><span class="qtext">報到機制的兩種本質區分</span></div>
+    <div class="qdesc">「報到」實為兩種不同技術需求：(a)驗證特定已報名人員到場（供贊助方核銷）、(b)僅需證明總人數到場</div>
+    <div class="meta-row"><span class="chip interview">僅訪談提及</span></div>
+    <div class="likert-row"><span class="label">迫切性</span><label><input type="radio" name="n25-urg" value="1">1</label><label><input type="radio" name="n25-urg" value="2">2</label><label><input type="radio" name="n25-urg" value="3">3</label><label><input type="radio" name="n25-urg" value="4">4</label><label><input type="radio" name="n25-urg" value="5">5</label></div>
+    <div class="likert-row"><span class="label">重要性</span><label><input type="radio" name="n25-imp" value="1">1</label><label><input type="radio" name="n25-imp" value="2">2</label><label><input type="radio" name="n25-imp" value="3">3</label><label><input type="radio" name="n25-imp" value="4">4</label><label><input type="radio" name="n25-imp" value="5">5</label></div>
+    <label class="na"><input type="checkbox" class="na-check">不適用／不熟悉</label>
+    <textarea class="comment" placeholder="補充意見（選填）"></textarea>
+  </div>
+
+  <div class="qcard" data-src="interview" data-id="n26">
+    <div class="qhead"><span class="qnum">N26</span><span class="qtext">無email族群的替代聯繫與報到管道</span></div>
+    <div class="qdesc">部分參與者（如偏鄉里民）無email或不熟悉數位工具，報到與後續聯繫需替代方案（SMS最貴但有效、Line次之）</div>
+    <div class="meta-row"><span class="chip interview">僅訪談提及</span></div>
+    <div class="likert-row"><span class="label">迫切性</span><label><input type="radio" name="n26-urg" value="1">1</label><label><input type="radio" name="n26-urg" value="2">2</label><label><input type="radio" name="n26-urg" value="3">3</label><label><input type="radio" name="n26-urg" value="4">4</label><label><input type="radio" name="n26-urg" value="5">5</label></div>
+    <div class="likert-row"><span class="label">重要性</span><label><input type="radio" name="n26-imp" value="1">1</label><label><input type="radio" name="n26-imp" value="2">2</label><label><input type="radio" name="n26-imp" value="3">3</label><label><input type="radio" name="n26-imp" value="4">4</label><label><input type="radio" name="n26-imp" value="5">5</label></div>
+    <label class="na"><input type="checkbox" class="na-check">不適用／不熟悉</label>
+    <textarea class="comment" placeholder="補充意見（選填）"></textarea>
+  </div>
+
+  <div class="qcard" data-src="interview" data-id="n27">
+    <div class="qhead"><span class="qnum">N27</span><span class="qtext">AAR事後檢討與跨平台通訊紀錄自動彙整</span></div>
+    <div class="qdesc">現場工作紀錄仰賴記憶，希望AI能從Mattermost/Line/Email自動彙整通訊紀錄成文件與事後檢討報告</div>
+    <div class="meta-row"><span class="chip interview">僅訪談提及</span></div>
+    <div class="likert-row"><span class="label">迫切性</span><label><input type="radio" name="n27-urg" value="1">1</label><label><input type="radio" name="n27-urg" value="2">2</label><label><input type="radio" name="n27-urg" value="3">3</label><label><input type="radio" name="n27-urg" value="4">4</label><label><input type="radio" name="n27-urg" value="5">5</label></div>
+    <div class="likert-row"><span class="label">重要性</span><label><input type="radio" name="n27-imp" value="1">1</label><label><input type="radio" name="n27-imp" value="2">2</label><label><input type="radio" name="n27-imp" value="3">3</label><label><input type="radio" name="n27-imp" value="4">4</label><label><input type="radio" name="n27-imp" value="5">5</label></div>
+    <label class="na"><input type="checkbox" class="na-check">不適用／不熟悉</label>
+    <textarea class="comment" placeholder="補充意見（選填）"></textarea>
+  </div>
+
+  <div class="note-box">
+    <b>N11（系統維運長期風險／政府採購法技術鎖定）未列入本問卷評分</b>——此項屬制度性政策建言，非單一可迫切/重要程度評分之技術功能項目，將另行整理進最終報告之政策建議章節，不影響本次矩陣結果之解讀。
+  </div>
+</div>
+
+<script>
+function exportAnswers(){
+  const cards = document.querySelectorAll('.qcard');
+  let out = '迫切性／重要性矩陣評估問卷 填答結果\n產生時間：' + new Date().toLocaleString('zh-TW') + '\n' + '='.repeat(40) + '\n\n';
+  cards.forEach(card => {
+    const num = card.querySelector('.qnum').innerText;
+    const text = card.querySelector('.qtext').innerText;
+    const na = card.querySelector('.na-check').checked;
+    const urgChecked = card.querySelector('input[name$="-urg"]:checked');
+    const impChecked = card.querySelector('input[name$="-imp"]:checked');
+    const comment = card.querySelector('.comment').value.trim();
+    out += `【${num}】${text}\n`;
+    if(na){
+      out += `不適用／不熟悉\n`;
+    } else {
+      out += `迫切性：${urgChecked ? urgChecked.value : '（未填）'}　重要性：${impChecked ? impChecked.value : '（未填）'}\n`;
+    }
+    if(comment) out += `補充意見：${comment}\n`;
+    out += `\n`;
+  });
+  const blob = new Blob([out], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = '迫切性重要性矩陣填答_' + new Date().toISOString().slice(0,10) + '.txt';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+</script>
+</body>
+</html>
